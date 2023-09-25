@@ -1,0 +1,25 @@
+{
+  "name": "market-place",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vivek-0206/Market-Hub.git"
+  },
+  "keywords": [
+    "Market",
+    "Client",
+    "Customers",
+    "Products."
+  ],
+  "author": "Vivek Patel, Yatharth Shah, Om Italiya, Krunalkumar Mangukiya, Sheshankumar Patel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Vivek-0206/Market-Hub/issues"
+  },
+  "homepage": "https://github.com/Vivek-0206/Market-Hub#readme"
+}
