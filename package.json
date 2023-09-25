@@ -1,25 +1,40 @@
 {
-  "name": "market-place",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Vivek-0206/Market-Hub.git"
-  },
-  "keywords": [
-    "Market",
-    "Client",
-    "Customers",
-    "Products."
-  ],
-  "author": "Vivek Patel, Yatharth Shah, Om Italiya, Krunalkumar Mangukiya, Sheshankumar Patel",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Vivek-0206/Market-Hub/issues"
-  },
-  "homepage": "https://github.com/Vivek-0206/Market-Hub#readme"
+	"name": "market-place",
+	"version": "1.0.0",
+	"type": "module",
+	"description": "Market Place is a web application that allows users to buy and sell products at single place.",
+	"main": "index.js",
+	"scripts": {
+		"start": "node backend/index.js",
+		"client": "npm start --prefix frontend",
+		"server": "nodemon backend/index.js",
+		"dev": "concurrently \"npm run server\" \"npm run client\""
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Vivek-0206/Market-Hub.git"
+	},
+	"keywords": [
+		"Market",
+		"Client",
+		"Customers",
+		"Products."
+	],
+	"author": "Vivek Patel, Yatharth Shah, Om Italiya, Krunalkumar Mangukiya, Sheshankumar Patel",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/Vivek-0206/Market-Hub/issues"
+	},
+	"homepage": "https://github.com/Vivek-0206/Market-Hub#readme",
+	"dependencies": {
+		"bcryptjs": "^2.4.3",
+		"dotenv": "^16.3.1",
+		"express": "^4.18.2",
+		"jsonwebtoken": "^9.0.2",
+		"mongoose": "^7.5.3"
+	},
+	"devDependencies": {
+		"concurrently": "^8.2.1",
+		"nodemon": "^3.0.1"
+	}
 }
