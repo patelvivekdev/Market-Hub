@@ -1,5 +1,5 @@
 printWidth: 80
-tabWidth: 4
+tabWidth: 5
 useTabs: true
 semi: true
 singleQuote: true
@@ -7,3 +7,4 @@ bracketSpacing: true
 jsxBracketSameLine: false
 jsxSingleQuote: true
 trailingComma: es5
+editor.formatOnSave": true,
