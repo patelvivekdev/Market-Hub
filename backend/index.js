@@ -1,8 +1,9 @@
 // Imports
-import express from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
+import express from 'express';
 import mongoose from 'mongoose';
+
 import userRoutes from './routes/userRoutes.js';
 
 // dotenv config
@@ -33,7 +34,5 @@ app.use('/api/v1/users', userRoutes);
 
 // Listen
 app.listen(PORT, () =>
-	console.log(
-		`--> Server running on port: ${PORT} link: http://localhost:${PORT}`
-	)
+	console.log(`--> Server running on: http://localhost:${PORT}`)
 );

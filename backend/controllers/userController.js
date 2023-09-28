@@ -1,6 +1,11 @@
-import User from '../models/userModel.js';
 import asyncHandler from 'express-async-handler';
+import bcrypt from 'bcryptjs';
+
+import Admin from '../models/adminModel.js';
+import Client from '../models/clientModel.js';
 import generateToken from '../utils/generateToken.js';
+import User from '../models/userModel.js';
+import Vendor from '../models/vendorModel.js';
 
 // Check user email for login
 const checkEmail = asyncHandler(async (req, res) => {
@@ -39,10 +44,9 @@ const authUser = asyncHandler(async (req, res) => {
 	if (user && (await user.matchPassword(password))) {
 		res.json({
 			_id: user._id,
-			name: user.name,
 			email: user.email,
-			isAdmin: user.isAdmin,
-			token: generateToken(user._id),
+			userType: user.userType,
+			token: generateToken(user._id, user.userType),
 			message: 'User logged in successfully',
 		});
 	} else {
@@ -51,22 +55,12 @@ const authUser = asyncHandler(async (req, res) => {
 	}
 });
 
-// Register a new user
+// Register a new user based on user type (client, vendor, admin) and create a profile for the user
 const registerUser = asyncHandler(async (req, res) => {
-	const { name, email, password } = req.body;
-
-	// Check if user exists
-	const userExists = await User.findOne({ email });
-
-	if (userExists) {
-		res.status(400).json({
-			message: 'User already exists',
-		});
-		throw new Error('--> Error: User already exists');
-	}
+	const { username, email, password, userType, profile } = req.body;
 
 	// check the user details
-	if (!name || !email || !password) {
+	if (!username || !email || !password) {
 		res.status(400).json({
 			message: 'Please fill all the fields',
 		});
@@ -94,41 +88,86 @@ const registerUser = asyncHandler(async (req, res) => {
 		);
 	}
 
+	// Check if user exists with same email or username
+	const userExists = await User.findOne({
+		$or: [{ email: email }, { username: email }],
+	});
+
+	if (userExists) {
+		res.status(400).json({
+			message: 'User already exists',
+		});
+		throw new Error('--> Error: User already exists.');
+	}
+
+	// Create user based on user type
 	const user = await User.create({
-		name,
+		username,
 		email,
 		password,
-		isAdmin: req.body.isAdmin || false,
+		userType,
 	});
+
+	// Create user profile
+	let userDetails;
+	if (userType === 'Client') {
+		userDetails = await Client.create({
+			clientName: profile.name,
+			phone: profile.phone,
+			address: profile.address,
+		});
+	} else if (userType === 'Vendor') {
+		userDetails = await Vendor.create({
+			vendorName: profile.name,
+			phone: profile.phone,
+			address: profile.address,
+		});
+	} else if (userType === 'Admin') {
+		userDetails = await Admin.create({
+			adminName: profile.name,
+			phone: profile.phone,
+			address: profile.address,
+		});
+	} else {
+		return res.status(400).json({
+			message: "User type doesn't exist",
+		});
+	}
+
+	// connect client to user
+	user.profile = userDetails._id;
+
+	// password encryption
+	const salt = await bcrypt.genSalt(10);
+	user.password = await bcrypt.hash(user.password, salt);
+
+	// Save the user and client
+	await user.save();
+	await userDetails.save();
 
 	if (user) {
 		res.status(201).json({
 			_id: user._id,
-			name: user.name,
+			username: user.username,
 			email: user.email,
-			isAdmin: user.isAdmin,
-			token: generateToken(user._id),
+			token: generateToken(user._id, user.userType),
 			message: 'User created successfully',
 		});
 	} else {
-		res.status(400).json({
+		return res.status(400).json({
 			message: 'Something went wrong, please try again.',
 		});
-		throw new Error('--> Error: Invalid user data');
 	}
 });
 
 // Get user profile
 const getUserProfile = asyncHandler(async (req, res) => {
-	const user = await User.findById(req.user._id);
+	const user = await User.findById(req.user._id)
+		.populate('profile')
+		.select('-password');
 
 	if (user) {
-		res.json({
-			_id: user._id,
-			name: user.name,
-			email: user.email,
-			isAdmin: user.isAdmin,
-		});
+		res.json(user);
 	} else {
 		res.status(401);
 		throw new Error('--> Error: Invalid email or password');
@@ -144,30 +183,99 @@ const getUserProfile = asyncHandler(async (req, res) => {
 // 	res.status(200).json({ message: 'Logged out successfully' });
 // };
 
-// Update user profile
+// Update user details
+async function updateUserDetails(user, requestData) {
+	user.username = requestData.username || user.username;
+	user.email = requestData.email || user.email;
+	if (requestData.password) {
+		// Password encryption
+		const salt = await bcrypt.genSalt(10);
+		user.password = await bcrypt.hash(requestData.password, salt);
+	}
+
+	return await user.save();
+}
+
+// Update user profile details
+async function updateUserProfileDetails(user, userType, requestData) {
+	let userDetails;
+
+	if (userType === 'Client') {
+		userDetails = await Client.findById(user.profile);
+	} else if (userType === 'Vendor') {
+		userDetails = await Vendor.findById(user.profile);
+	} else if (userType === 'Admin') {
+		userDetails = await Admin.findById(user.profile);
+	}
+
+	if (userDetails) {
+		userDetails.name = requestData.profile.name || userDetails.name;
+		userDetails.phone = requestData.profile.phone || userDetails.phone;
+		userDetails.address =
+			requestData.profile.address || userDetails.address;
+		await userDetails.save();
+	}
+
+	return userDetails;
+}
+
 const updateUserProfile = asyncHandler(async (req, res) => {
+	const user = await User.findById(req.user._id);
+	const userType = req.user.userType;
+
+	if (user) {
+		const updatedUserDetails = await updateUserDetails(user, req.body);
+		const updatedUserProfileDetails = await updateUserProfileDetails(
+			user,
+			userType,
+			req.body
+		);
+
+		if (updatedUserDetails) {
+			res.json({
+				_id: updatedUserDetails._id,
+				username: updatedUserDetails.username,
+				email: updatedUserDetails.email,
+				profile: updatedUserProfileDetails,
+				message: 'User profile updated successfully',
+			});
+		} else {
+			res.status(401).json({
+				message: 'User not found',
+			});
+			throw new Error('--> Error: Invalid email or password');
+		}
+	} else {
+		return res.status(401).json({
+			message: 'User not found',
+		});
+	}
+});
+
+// for delete user account (deactivate user) up to 7 days
+const deactivateUser = asyncHandler(async (req, res) => {
 	const user = await User.findById(req.user._id);
 
 	if (user) {
-		user.name = req.body.name || user.name;
-		user.email = req.body.email || user.email;
-		if (req.body.password) {
-			user.password = req.body.password;
-		}
-
-		const updatedUser = await user.save();
-
+		user.isActive = false;
+		await user.save();
 		res.json({
-			_id: updatedUser._id,
-			name: updatedUser.name,
-			email: updatedUser.email,
-			isAdmin: updatedUser.isAdmin,
-			token: generateToken(updatedUser._id),
+			message: 'User deactivated successfully',
 		});
 	} else {
-		res.status(401);
+		res.status(401).json({
+			message: 'User not found',
+		});
 		throw new Error('--> Error: Invalid email or password');
 	}
+});
+
+// ------------------------------ ADMIN ------------------------------
+
+// Get all users
+const getUsers = asyncHandler(async (req, res) => {
+	const users = await User.find({});
+	res.json(users);
 });
 
 // Delete user
@@ -191,15 +299,11 @@ const deleteUser = asyncHandler(async (req, res) => {
 	}
 });
 
-// Get all users
-const getUsers = asyncHandler(async (req, res) => {
-	const users = await User.find({});
-	res.json(users);
-});
-
 // Get user by id
 const getUserById = asyncHandler(async (req, res) => {
-	const user = await User.findById(req.params.id).select('-password');
+	const user = await User.findById(req.params.id)
+		.populate('profile')
+		.select('-password');
 
 	if (user) {
 		res.json(user);
@@ -209,29 +313,30 @@ const getUserById = asyncHandler(async (req, res) => {
 	}
 });
 
-// Update user
+// Update user only by admin user
+// only update user details, not profile details
 const updateUser = asyncHandler(async (req, res) => {
 	const user = await User.findById(req.params.id);
 
 	if (user) {
-		user.name = req.body.name || user.name;
+		user.username = req.body.username || user.username;
 		user.email = req.body.email || user.email;
-		user.isAdmin =
-			req.body.isAdmin === undefined ? user.isAdmin : req.body.isAdmin;
+		user.userType = req.body.userType || user.userType;
+		user.isActive = req.body.isActive || user.isActive;
+		user.isAdmin = req.body.isAdmin || user.isAdmin;
 
 		const updatedUser = await user.save();
 
 		res.json({
 			_id: updatedUser._id,
-			name: updatedUser.name,
+			username: updatedUser.username,
 			email: updatedUser.email,
+			userType: updatedUser.userType,
+			isActive: updatedUser.isActive,
 			isAdmin: updatedUser.isAdmin,
-			message: 'User updated successfully',
 		});
 	} else {
-		res.status(404).json({
-			message: 'User not found',
-		});
+		res.status(404);
 		throw new Error('--> Error: User not found');
 	}
 });
@@ -239,7 +344,6 @@ const updateUser = asyncHandler(async (req, res) => {
 export {
 	authUser,
 	registerUser,
-	logoutUser,
 	getUserProfile,
 	updateUserProfile,
 	getUsers,
@@ -247,4 +351,5 @@ export {
 	checkEmail,
 	getUserById,
 	updateUser,
+	deactivateUser,
 };

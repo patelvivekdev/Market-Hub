@@ -1,4 +1,5 @@
 import express from 'express';
+
 import {
 	authUser,
 	registerUser,
@@ -9,6 +10,7 @@ import {
 	getUserById,
 	updateUser,
 	checkEmail,
+	deactivateUser,
 } from '../controllers/userController.js';
 
 import { protect, admin } from '../middleware/authMiddleware.js';
@@ -19,9 +21,7 @@ const router = express.Router();
 router.route('/check').post(checkEmail);
 
 // Base route
-router.route('/')
-	.post(registerUser)
-	.get(protect, admin, getUsers);
+router.route('/').post(registerUser).get(protect, admin, getUsers);
 
 // Auth route
 router.post('/auth', authUser);
@@ -29,11 +29,12 @@ router.post('/auth', authUser);
 // Logout route
 // router.post('/logout', logoutUser);
 
-// Profile route
+// Profile route (for logged in user) 
 router
 	.route('/profile')
 	.get(protect, getUserProfile)
-	.put(protect, updateUserProfile);
+	.put(protect, updateUserProfile)
+	.delete(protect, deactivateUser);
 
 // Admin routes
 router

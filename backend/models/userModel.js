@@ -1,11 +1,12 @@
-import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import mongoose from 'mongoose';
 
 const userSchema = mongoose.Schema(
 	{
-		name: {
+		username: {
 			type: String,
 			required: true,
+			unique: true,
 		},
 		email: {
 			type: String,
@@ -16,10 +17,22 @@ const userSchema = mongoose.Schema(
 			type: String,
 			required: true,
 		},
-		isAdmin: {
-			type: Boolean,
+		userType: {
+			type: String,
+			enum: ['Client', 'Vendor', 'Admin'],
 			required: true,
+		},
+		profile: {
+			type: mongoose.Schema.Types.ObjectId,
+			refPath: 'userType',
+		},
+		isEmailVerified: {
+			type: Boolean,
 			default: false,
+		},
+		isActive: {
+			type: Boolean,
+			default: true,
 		},
 	},
 	{
@@ -41,6 +54,8 @@ userSchema.pre('save', async function (next) {
 	const salt = await bcrypt.genSalt(10);
 	this.password = bcrypt.hash(this.password, salt);
 });
+
+userSchema;
 
 const User = mongoose.model('User', userSchema);
 
