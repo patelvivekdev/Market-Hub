@@ -110,7 +110,7 @@ const RegisterScreen = () => {
 
     if (!isError) {
       try {
-        const BASE_URL = 'http://localhost:5000/api/v1';
+        const BASE_URL = 'https://market-hub-api-ka4z.onrender.com/api/v1';
         const config = {
           headers: {
             'Content-Type': 'application/json',

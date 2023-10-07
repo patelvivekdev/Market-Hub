@@ -12,7 +12,7 @@ const LoginScreen = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      const BASE_URL = 'https://market-hub.onrender.com/';
+      const BASE_URL = 'https://market-hub-api-ka4z.onrender.com/api/v1';
       const config = {
         headers: {
           'Content-Type': 'application/json',
