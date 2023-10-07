@@ -14,6 +14,12 @@ const vendorSchema = mongoose.Schema({
 	address: {
 		type: String,
 	},
+	website: {
+		type: String,
+	},
+	description: {
+		type: String,
+	},
 });
 
 const Vendor = mongoose.model('Vendor', vendorSchema);

@@ -15,11 +15,14 @@ const checkEmail = asyncHandler(async (req, res) => {
 
 	if (user) {
 		res.status(400).json({
+			found: true,
+			email: email,
 			message: 'User already exists',
 		});
 		throw new Error('--> Error: User already exists');
 	} else {
 		res.status(200).json({
+			found: false,
 			email: email,
 			message: 'User not found',
 		});
@@ -33,10 +36,9 @@ const authUser = asyncHandler(async (req, res) => {
 
 	// check the user details
 	if (!email || !password) {
-		res.status(400).json({
+		return res.status(400).json({
 			message: 'Please fill all the fields',
 		});
-		throw new Error('--> Error: Invalid user data');
 	}
 
 	const user = await User.findOne({ email });
@@ -50,8 +52,9 @@ const authUser = asyncHandler(async (req, res) => {
 			message: 'User logged in successfully',
 		});
 	} else {
-		res.status(401);
-		throw new Error('--> Error: Invalid email or password');
+		return res.status(401).json({
+			message: 'Invalid email or password',
+		});
 	}
 });
 

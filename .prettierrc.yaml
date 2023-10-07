@@ -7,4 +7,4 @@ bracketSpacing: true
 jsxBracketSameLine: false
 jsxSingleQuote: true
 trailingComma: es5
-editor.formatOnSave": true,
+editor.formatOnSave": true

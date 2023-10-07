@@ -1,5 +1,6 @@
 // Imports
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
@@ -24,6 +25,7 @@ try {
 // Init express
 const app = express();
 
+app.use(cors());
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
