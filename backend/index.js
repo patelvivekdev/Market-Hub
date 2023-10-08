@@ -13,18 +13,6 @@ dotenv.config();
 // PORT INIT
 const PORT = process.env.PORT || 5000;
 
-// check if env is production
-if (process.env.NODE_ENV === 'production') {
-	// set static folder
-	app.use(express.static(path.join(__dirname, '/frontend/build')));
-
-	app.get('*', (req, res) =>
-		res.sendFile(
-			path.resolve(__dirname, 'frontend', 'build', 'index.html')
-		)
-	);
-}
-
 // Connect to db
 try {
 	const conn = await mongoose.connect(process.env.MONGO_URI);
@@ -37,6 +25,17 @@ try {
 // Init express
 const app = express();
 
+// check if env is production
+if (process.env.NODE_ENV === 'production') {
+	// set static folder
+	app.use(express.static(path.join(__dirname, '/frontend/build')));
+
+	app.get('*', (req, res) =>
+		res.sendFile(
+			path.resolve(__dirname, 'frontend', 'build', 'index.html')
+		)
+	);
+}
 app.use(cors());
 // Middleware
 app.use(express.json());
