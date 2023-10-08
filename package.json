@@ -26,7 +26,7 @@
 	"bugs": {
 		"url": "https://github.com/Vivek-0206/Market-Hub/issues"
 	},
-	"homepage": "https://github.com/Vivek-0206/Market-Hub#readme",
+	"homepage": "https://market-hub.onrender.com/",
 	"dependencies": {
 		"bcryptjs": "^2.4.3",
 		"cors": "^2.8.5",

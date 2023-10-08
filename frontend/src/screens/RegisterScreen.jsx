@@ -73,7 +73,7 @@ const RegisterScreen = () => {
 
     // check if email already exists
     try {
-      const BASE_URL = 'https://market-hub.onrender.com/';
+      const BASE_URL = 'https://market-hub.onrender.com/api/v1';
       const config = {
         headers: {
           'Content-Type': 'application/json',

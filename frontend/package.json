@@ -2,7 +2,7 @@
 	"name": "frontend",
 	"version": "1.0.0",
 	"private": true,
-	"proxy": "https://market-hub-api-ka4z.onrender.com/",
+	"proxy": "https://market-hub.onrender.com/",
 	"dependencies": {
 		"@testing-library/jest-dom": "^5.17.0",
 		"@testing-library/react": "^13.4.0",
