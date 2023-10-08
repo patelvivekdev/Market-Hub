@@ -1,5 +1,4 @@
 // Imports
-import bodyParser from 'body-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -25,9 +24,16 @@ try {
 // Init express
 const app = express();
 
-// check if env is production
+app.use(cors());
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+// Routes
+app.use('/api/v1/users', userRoutes);
+
 if (process.env.NODE_ENV === 'production') {
-	// set static folder
+	const __dirname = path.resolve();
 	app.use(express.static(path.join(__dirname, '/frontend/build')));
 
 	app.get('*', (req, res) =>
@@ -35,15 +41,12 @@ if (process.env.NODE_ENV === 'production') {
 			path.resolve(__dirname, 'frontend', 'build', 'index.html')
 		)
 	);
+} else {
+	const __dirname = path.resolve();
+	app.get('/', (req, res) => {
+		res.send('API is running....');
+	});
 }
-app.use(cors());
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-
-// Routes
-app.get('/', (req, res) => res.send('API is running...'));
-app.use('/api/v1/users', userRoutes);
 
 // Listen
 app.listen(PORT, () =>
