@@ -29,6 +29,9 @@ const HomeScreen = () => {
 
 		if (!userInfo) {
 			window.location.href = '/login';
+			return;
+		} else {
+			setIsLoading(true);
 		}
 
 		if (userInfo['userType'] === 'Admin') {
@@ -50,7 +53,6 @@ const HomeScreen = () => {
 					BASE_URL + '/products/',
 					config
 				);
-				console.log(data, "data");
 				setProducts(data);
 				setIsLoading(false);
 			} catch (error) {
