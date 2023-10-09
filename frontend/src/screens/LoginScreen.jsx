@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Form, Button, Row, Col } from 'react-bootstrap';
+import { Row, Col, Container, Modal, Button, Form } from 'react-bootstrap';
 import FormContainer from '../components/FormContainer';
 import Loader from '../components/Loader';
 import { toast } from 'react-toastify';
@@ -16,8 +16,6 @@ const LoginScreen = () => {
 
 	// for isError state
 	const [isError, setIsError] = useState(false);
-
-	// create helper method to show toast
 
 	// set toast id
 	const customId = "loginToastId";
@@ -74,15 +72,14 @@ const LoginScreen = () => {
 				if (data) {
 					localStorage.setItem('userInfo', JSON.stringify(data));
 					toast.success('Login successful');
+					// clear form
+					setEmail('');
+					setPassword('');
 					if (data.userType === 'Admin') {
 						window.location.href = '/products';
 					} else {
 						window.location.href = '/';
 					}
-
-					// clear form
-					setEmail('');
-					setPassword('');
 				}
 			} catch (err) {
 				toast.error(err?.data?.message || err?.response?.data?.message || 'Something went wrong while login! Please try again later.');
@@ -128,9 +125,21 @@ const LoginScreen = () => {
 			<Row className='py-3'>
 				<Col>
 					New Customer?{' '}
-					<Link to='/register'>
-						Register
-					</Link>
+					<Button
+						variant='light'
+						className='btn btn-outline-primary ms-2'
+						onClick={() => window.location.href = 'Client/register'}
+					>
+						Register as Client
+					</Button>{' '}
+					or{' '}
+					<Button
+						variant='light'
+						className='btn btn-outline-secondary ms-2'
+						onClick={() => window.location.href = '/Vendor/register'}
+					>
+						Register as vendor
+					</Button>
 				</Col>
 			</Row>
 		</FormContainer>

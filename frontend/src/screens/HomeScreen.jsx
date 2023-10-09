@@ -40,7 +40,7 @@ const HomeScreen = () => {
 							<Card.Body className='d-flex flex-column'>
 								<Card.Title>{product.name}</Card.Title>
 								<Card.Text>{product.description}</Card.Text>
-								<Button variant='primary' className='mt-auto'
+								<Button variant='dark' className='mt-auto text-white'
 									onClick={() => {
 										window.location.href = `/products/${product._id}`;
 									}
