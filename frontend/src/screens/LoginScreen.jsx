@@ -136,7 +136,7 @@ const LoginScreen = () => {
 					<Button
 						variant='light'
 						className='btn btn-outline-secondary ms-2'
-						onClick={() => window.location.href = '/Vendor/register'}
+						onClick={() => window.location.href = 'Vendor/register'}
 					>
 						Register as vendor
 					</Button>

@@ -39,9 +39,9 @@ const Header = () => {
   const handleRegister = () => {
     // Based on the selected role, redirect to the corresponding registration page
     if (selectedRole === 'Client') {
-      window.location.href = '/Client/register';
+      window.location.href = 'Client/register';
     } else if (selectedRole === 'Vendor') {
-      window.location.href = '/Vendor/register';
+      window.location.href = 'Vendor/register';
     }
 
     // Close the modal
