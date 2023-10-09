@@ -29,7 +29,7 @@ router.post('/auth', authUser);
 // Logout route
 // router.post('/logout', logoutUser);
 
-// Profile route (for logged in user) 
+// Profile route (for logged in user)
 router
 	.route('/profile')
 	.get(protect, getUserProfile)

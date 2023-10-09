@@ -31,7 +31,7 @@ const Header = () => {
                 <>
                   <LinkContainer to='/profile'>
                     <Nav.Link>
-                      <FaUser /> Profile
+                      <FaUser /> {user.username}
                     </Nav.Link>
                   </LinkContainer>
                   <LinkContainer to='/login' onClick={logoutHandler}>

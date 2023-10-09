@@ -12,6 +12,9 @@ node_modules
 # production
 /build
 
+# DATA
+data
+
 # misc
 .DS_Store
 .env

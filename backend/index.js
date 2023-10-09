@@ -6,6 +6,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 
 import userRoutes from './routes/userRoutes.js';
+import productRoutes from './routes/productRoutes.js';
 
 // dotenv config
 dotenv.config();
@@ -32,6 +33,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // Routes
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/products', productRoutes);
 
 if (process.env.NODE_ENV === 'production') {
 	const __dirname = path.resolve();

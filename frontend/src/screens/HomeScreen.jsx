@@ -1,22 +1,66 @@
-// Home Screen 
+import React, { useEffect, useState } from 'react';
+import { Table, Button, Row, Col } from 'react-bootstrap';
+import Loader from '../components/Loader';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
-import React from 'react';
-import { Row, Col, Button, Table } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+const HomeScreen = () => {
+	const [products, setProducts] = useState([]);
+	const [isLoading, setIsLoading] = useState(false);
+	const [isError, setIsError] = useState(false);
+	const [isAdmin, setIsAdmin] = useState(false);
 
-const HomeScreen = ({ history, match }) => {
-	const products = [];
+	const showToast = (message) => {
+		toast.error(message, {
+			autoClose: false,
+			onClose: clearLoadingState,
+		});
+	};
 
-	// get the user info from the local storage
-	const userInfo = localStorage.getItem('userInfo');
+	const clearLoadingState = () => {
+		setIsError(false);
+		setIsLoading(false);
+	};
 
-	// if the user is not logged in, redirect to login page
-	if (!userInfo) {
-		window.location.href = '/login';
-	}
+	useEffect(() => {
+		const userInfo = localStorage.getItem('userInfo')
+			? JSON.parse(localStorage.getItem('userInfo'))
+			: null;
 
-	// if the user is logged in, get the user info from the local storage
-	const user = JSON.parse(userInfo);
+		if (!userInfo) {
+			window.location.href = '/login';
+		}
+
+		if (userInfo['userType'] === 'Admin') {
+			setIsAdmin(isAdmin);
+		}
+
+		const fetchProducts = async () => {
+			try {
+				setIsLoading(true);
+				const BASE_URL = 'https://market-hub.onrender.com/api/v1';
+				const config = {
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${userInfo.token}`,
+					},
+				};
+
+				const { data } = await axios.get(
+					BASE_URL + '/products/',
+					config
+				);
+				console.log(data, "data");
+				setProducts(data);
+				setIsLoading(false);
+			} catch (error) {
+				showToast(error.response.data.message);
+				setIsLoading(false);
+			}
+		};
+
+		fetchProducts();
+	}, [isAdmin]);
 
 	return (
 		<>
@@ -25,48 +69,42 @@ const HomeScreen = ({ history, match }) => {
 					<h1>Products</h1>
 				</Col>
 
-				{user?.userType === 'Admin' && (
+				{isAdmin && (
 					<Col className='text-right'>
-						<LinkContainer to='/admin/product/create'>
-							<Button className='my-3'>
-								<i className='fas fa-plus'></i> Create Product
-							</Button>
-						</LinkContainer>
+						<Button className='my-3'>
+							<i className='fas fa-plus'></i> Create Product
+						</Button>
 					</Col>
 				)}
-
 			</Row>
-			<Table striped bordered hover responsive className='table-sm'>
-				<thead>
-					<tr>
-						<th>NAME</th>
-						<th>PRICE</th>
-						<th>CATEGORY</th>
-						<th>BRAND</th>
-						<th>Vendor</th>
-					</tr>
-				</thead>
-				<tbody>
-					{products?.map((product) => (
-						<tr key={product._id}>
-							<td>{product.name}</td>
-							<td>${product.price}</td>
-							<td>{product.category}</td>
-							<td>{product.brand}</td>
-							<td>
-								<LinkContainer to={`/admin/product/${product._id}/edit`}>
-									<Button variant='light' className='btn-sm'>
-										<i className='fas fa-edit'></i>
-									</Button>
-								</LinkContainer>
-							</td>
+			{isLoading ? (
+				<Loader />
+			) : isError ? (
+				<p>Error loading products.</p>
+			) : (
+				<Table striped bordered hover responsive className='table-sm'>
+					<thead>
+						<tr>
+							<th>NAME</th>
+							<th>PRICE</th>
+							<th>CATEGORY</th>
+							<th>Vendor</th>
 						</tr>
-					))}
-				</tbody>
-			</Table>
+					</thead>
+					<tbody>
+						{products.map((product) => (
+							<tr key={product._id}>
+								<td>{product.name}</td>
+								<td>${product.price}</td>
+								<td>{product.category}</td>
+								<td>{product.vendor.vendorName}</td>
+							</tr>
+						))}
+					</tbody>
+				</Table>
+			)}
 		</>
-
-	)
-}
+	);
+};
 
 export default HomeScreen;
