@@ -38,7 +38,7 @@ JWT_SECRET=YOUR_JWT_SECRET
 ```
 
 ```md
-npm run concurrent
+npm run dev
 ```
 
 `PRODUCTION` Make sure to create a `.env` file in the root directory and add the following variables
@@ -51,7 +51,7 @@ JWT_SECRET=YOUR_JWT_SECRET
 ```
 
 ```md
-npm run dev
+npm run build
 node backend/index.js
 ```
 

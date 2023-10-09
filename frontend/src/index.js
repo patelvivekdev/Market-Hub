@@ -15,16 +15,25 @@ import {
 	RouterProvider,
 } from 'react-router-dom';
 import HomeScreen from './screens/HomeScreen';
+import ProductsScreen from './screens/ProductsScreen';
+import ProductScreen from './screens/ProductScreen';
 
 const routes = createBrowserRouter(
 	createRoutesFromElements(
 		<Route path='/' element={<App />}>
 			<Route index={true} path='/' element={<HomeScreen />} />
+			{/* AUTH ROUTES */}
 			<Route path='/login' element={<LoginScreen />} />
 			<Route path='/:userType/register' element={<RegisterScreen />} />
-			<Route path='Client' element={<RegisterScreen />} />
-			<Route path='Vendor' element={<RegisterScreen />} />
+
+			{/* PRODUCT ROUTES */}
+			<Route path='/products' element={<ProductsScreen />} />
+			<Route path='/products/:id' element={<ProductScreen />} />
+
+			{/* ADMIN ROUTES */}
 			<Route path='Admin' element={<RegisterScreen />} />
+
+			{/* Not Found */}
 			<Route path='*' element={<h1>Not Found</h1>} />
 		</Route>
 	)

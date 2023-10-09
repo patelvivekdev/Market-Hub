@@ -41,7 +41,7 @@ const authUser = asyncHandler(async (req, res) => {
 		});
 	}
 
-	const user = await User.findOne({ email });
+	const user = await User.findOne({ email }).populate('profile');
 
 	if (user && (await user.matchPassword(password))) {
 		res.json({
@@ -50,6 +50,7 @@ const authUser = asyncHandler(async (req, res) => {
 			username: user.username || user.email,
 			userType: user.userType,
 			token: generateToken(user._id, user.userType),
+			profile: user.profile,
 			message: 'User logged in successfully',
 		});
 	} else {

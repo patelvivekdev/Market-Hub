@@ -1,74 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Button, Row, Col } from 'react-bootstrap';
-import Loader from '../components/Loader';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Button, Row, Col, Card } from 'react-bootstrap';
 
 const HomeScreen = () => {
 	const [products, setProducts] = useState([]);
-	const [isLoading, setIsLoading] = useState(false);
-	const [isError, setIsError] = useState(false);
-	const [isAdmin, setIsAdmin] = useState(false);
-
-	const showToast = (message) => {
-		toast.error(message, {
-			autoClose: false,
-			onClose: clearLoadingState,
-		});
-	};
-
-	const clearLoadingState = () => {
-		setIsError(false);
-		setIsLoading(false);
-	};
 
 	useEffect(() => {
-		const userInfo = localStorage.getItem('userInfo')
-			? JSON.parse(localStorage.getItem('userInfo'))
-			: null;
-
-		if (!userInfo) {
-			window.location.href = '/login';
-			return;
-		} else {
-			setIsLoading(true);
+		async function fetchProducts() {
+			const { data } = await axios.get('https://market-hub.onrender.com/api/v1/products/');
+			setProducts(data.slice(0, 6));
 		}
-
-		if (userInfo['userType'] === 'Admin') {
-			setIsAdmin(isAdmin);
-		}
-
-		const fetchProducts = async () => {
-			try {
-				setIsLoading(true);
-				const BASE_URL = 'https://market-hub.onrender.com/api/v1';
-				const config = {
-					headers: {
-						'Content-Type': 'application/json',
-						'Authorization': `Bearer ${userInfo.token}`,
-					},
-				};
-
-				const { data } = await axios.get(
-					BASE_URL + '/products/',
-					config
-				);
-				setProducts(data);
-				setIsLoading(false);
-			} catch (error) {
-				showToast(error.response.data.message);
-				setIsLoading(false);
-			}
-		};
 
 		fetchProducts();
-	}, [isAdmin]);
+	}, []);
+
+	const { userType } = JSON.parse(localStorage.getItem('userInfo')) || {};
+	const isAdmin = userType === 'Admin';
 
 	return (
 		<>
-			<Row className='align-items-center'>
+			<Row className='text-center'>
 				<Col>
-					<h1>Products</h1>
+					<h1>Latest Products</h1>
 				</Col>
 
 				{isAdmin && (
@@ -79,32 +32,27 @@ const HomeScreen = () => {
 					</Col>
 				)}
 			</Row>
-			{isLoading ? (
-				<Loader />
-			) : isError ? (
-				<p>Error loading products.</p>
-			) : (
-				<Table striped bordered hover responsive className='table-sm'>
-					<thead>
-						<tr>
-							<th>NAME</th>
-							<th>PRICE</th>
-							<th>CATEGORY</th>
-							<th>Vendor</th>
-						</tr>
-					</thead>
-					<tbody>
-						{products.map((product) => (
-							<tr key={product._id}>
-								<td>{product.name}</td>
-								<td>${product.price}</td>
-								<td>{product.category}</td>
-								<td>{product.vendor.vendorName}</td>
-							</tr>
-						))}
-					</tbody>
-				</Table>
-			)}
+
+			<Row>
+				{products.map((product) => (
+					<Col className='mt-4' key={product._id} sm={12} md={6} lg={4}>
+						<Card className='mb-3 h-100 d-flex'>
+							<Card.Body className='d-flex flex-column'>
+								<Card.Title>{product.name}</Card.Title>
+								<Card.Text>{product.description}</Card.Text>
+								<Button variant='primary' className='mt-auto'
+									onClick={() => {
+										window.location.href = `/products/${product._id}`;
+									}
+									}
+								>
+									View Details
+								</Button>
+							</Card.Body>
+						</Card>
+					</Col>
+				))}
+			</Row>
 		</>
 	);
 };

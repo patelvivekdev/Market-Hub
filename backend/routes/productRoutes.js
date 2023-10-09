@@ -11,9 +11,9 @@ import { protect, admin } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 // Base route
-router.route('/').get(protect, getProducts);
+router.route('/').get(getProducts);
 
 // Product route
-router.route('/:id').get(protect, getProductById);
+router.route('/:id').get(getProductById);
 
 export default router;

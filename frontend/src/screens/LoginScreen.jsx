@@ -75,7 +75,7 @@ const LoginScreen = () => {
 					localStorage.setItem('userInfo', JSON.stringify(data));
 					toast.success('Login successful');
 					if (data.userType === 'Admin') {
-						window.location.href = '/admin';
+						window.location.href = '/products';
 					} else {
 						window.location.href = '/';
 					}
