@@ -66,31 +66,26 @@ const registerUser = asyncHandler(async (req, res) => {
 
 	// check the user details
 	if (!username || !email || !password) {
-		res.status(400).json({
+		return res.status(400).json({
 			message: 'Please fill all the fields',
 		});
-		throw new Error('--> Error: Invalid user data');
 	}
 
 	// check email with regex
 	const emailRegex = /\S+@\S+\.\S+/;
 	if (!emailRegex.test(email)) {
-		res.status(400).json({
+		return res.status(400).json({
 			message: 'Please enter a valid email',
 		});
-		throw new Error('--> Error: Invalid email');
 	}
 
 	// Check password with regex
 	const passwordRegex =
 		/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm;
 	if (!passwordRegex.test(password)) {
-		res.status(400).json({
+		return res.status(400).json({
 			message: 'Please enter a valid password',
 		});
-		throw new Error(
-			'--> Error: Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number'
-		);
 	}
 
 	// Check if user exists with same email or username
@@ -99,10 +94,111 @@ const registerUser = asyncHandler(async (req, res) => {
 	});
 
 	if (userExists) {
-		res.status(400).json({
+		return res.status(400).json({
 			message: 'User already exists',
 		});
 		throw new Error('--> Error: User already exists.');
+	}
+
+	// Create user profile
+	let userDetails;
+	if (userType === 'Client') {
+		if (!profile.phone) {
+			return res.status(400).json({
+				message: 'Please enter a valid phone number',
+			});
+		}
+		if (!profile.address) {
+			return res.status(400).json({
+				message: 'Please enter a valid address',
+			});
+		}
+		if (!profile.name) {
+			return res.status(400).json({
+				message: 'Please enter a valid name',
+			});
+		}
+
+		// check if client exists with same phone number
+		const clientExists = await Client.findOne({
+			phone: profile.phone,
+		});
+
+		if (clientExists) {
+			return res.status(400).json({
+				message: 'Client already exists',
+			});
+		} else {
+			userDetails = await Client.create({
+				clientName: profile.name,
+				phone: profile.phone,
+				address: profile.address,
+			});
+		}
+	} else if (userType === 'Vendor') {
+		if (!profile.phone) {
+			return res.status(400).json({
+				message: 'Please enter a valid phone number',
+			});
+		}
+		if (!profile.address) {
+			return res.status(400).json({
+				message: 'Please enter a valid address',
+			});
+		}
+		if (!profile.name) {
+			return res.status(400).json({
+				message: 'Please enter a valid name',
+			});
+		}
+
+		// check if vendor exists with same phone number
+		const vendorExists = await Vendor.findOne({
+			phone: profile.phone,
+		});
+
+		if (vendorExists) {
+			return res.status(400).json({
+				message: 'Vendor already exists',
+			});
+		} else {
+			userDetails = await Vendor.create({
+				vendorName: profile.name,
+				phone: profile.phone,
+				address: profile.address,
+			});
+		}
+	} else if (userType === 'Admin') {
+		if (!profile.name) {
+			return res.status(400).json({
+				message: 'Please enter a valid name',
+			});
+		}
+		if (!profile.phone) {
+			return res.status(400).json({
+				message: 'Please enter a valid phone number',
+			});
+		}
+
+		// check if admin exists with same phone
+		const adminExists = await Admin.findOne({
+			phone: profile.phone,
+		});
+
+		if (adminExists) {
+			return res.status(400).json({
+				message: 'Admin already exists',
+			});
+		} else {
+			userDetails = await Admin.create({
+				name: profile.name,
+				phone: profile.phone,
+			});
+		}
+	} else {
+		return res.status(400).json({
+			message: "User type doesn't exist",
+		});
 	}
 
 	// Create user based on user type
@@ -112,32 +208,6 @@ const registerUser = asyncHandler(async (req, res) => {
 		password,
 		userType,
 	});
-
-	// Create user profile
-	let userDetails;
-	if (userType === 'Client') {
-		userDetails = await Client.create({
-			clientName: profile.name,
-			phone: profile.phone,
-			address: profile.address,
-		});
-	} else if (userType === 'Vendor') {
-		userDetails = await Vendor.create({
-			vendorName: profile.name,
-			phone: profile.phone,
-			address: profile.address,
-		});
-	} else if (userType === 'Admin') {
-		userDetails = await Admin.create({
-			adminName: profile.name,
-			phone: profile.phone,
-			address: profile.address,
-		});
-	} else {
-		return res.status(400).json({
-			message: "User type doesn't exist",
-		});
-	}
 
 	// connect client to user
 	user.profile = userDetails._id;
