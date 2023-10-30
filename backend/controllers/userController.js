@@ -1,11 +1,19 @@
 import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+import dotenv from 'dotenv';
 
 import Admin from '../models/adminModel.js';
 import Client from '../models/clientModel.js';
 import generateToken from '../utils/generateToken.js';
+import sendMail from './mailjetController.js';
+import TokenModel from '../models/tokenModel.js';
 import User from '../models/userModel.js';
 import Vendor from '../models/vendorModel.js';
+
+dotenv.config();
+
+// ------------------------------ EMAIL CHECK ------------------------
 
 // Check user email for login
 const checkEmail = asyncHandler(async (req, res) => {
@@ -14,21 +22,21 @@ const checkEmail = asyncHandler(async (req, res) => {
 	const user = await User.findOne({ email });
 
 	if (user) {
-		res.status(400).json({
+		return res.status(400).json({
 			found: true,
 			email: email,
 			message: 'User already exists',
 		});
-		throw new Error('--> Error: User already exists');
 	} else {
-		res.status(200).json({
+		return res.status(200).json({
 			found: false,
 			email: email,
 			message: 'User not found',
 		});
-		// throw new Error('User not found')
 	}
 });
+
+// ------------------------------ AUTH ------------------------------
 
 // Auth user & get token
 const authUser = asyncHandler(async (req, res) => {
@@ -44,7 +52,7 @@ const authUser = asyncHandler(async (req, res) => {
 	const user = await User.findOne({ email }).populate('profile');
 
 	if (user && (await user.matchPassword(password))) {
-		res.json({
+		return res.json({
 			_id: user._id,
 			email: user.email,
 			username: user.username || user.email,
@@ -221,6 +229,38 @@ const registerUser = asyncHandler(async (req, res) => {
 	await userDetails.save();
 
 	if (user) {
+		// create token
+		const token = crypto.randomBytes(32).toString('hex');
+		const validateAccount = await TokenModel.create({
+			email: email,
+			token: token,
+		});
+
+		const verifyUrl = `${process.env.BASE_URL}/verify-account/${token}`;
+
+		// send email
+		const message = `
+			<h1>You have successfully registered</h1>
+			<p>Thank you for registering with us.</p>
+
+			<p>Please go to this link to verify your account</p>
+			<a href=${verifyUrl} clicktracking=off>${verifyUrl}</a>
+
+			<p>Regards,</p>
+			<p>Team</p>
+		`;
+		try {
+			await sendMail({
+				Recipients: [{ Email: user.email }],
+				Subject: 'Registration Successful',
+				HTMLPart: message,
+			});
+		} catch (error) {
+			// delete token
+			await TokenModel.deleteOne({ token: validateAccount });
+			console.log("--> Error: Can't send email", error);
+		}
+
 		res.status(201).json({
 			_id: user._id,
 			username: user.username,
@@ -235,6 +275,17 @@ const registerUser = asyncHandler(async (req, res) => {
 	}
 });
 
+// Logout user
+// const logoutUser = (req, res) => {
+// 	res.cookie('jwt', '', {
+// 		httpOnly: true,
+// 		expires: new Date(0),
+// 	});
+// 	res.status(200).json({ message: 'Logged out successfully' });
+// };
+
+// ------------------------------ Profile ------------------------------
+
 // Get user profile
 const getUserProfile = asyncHandler(async (req, res) => {
 	const user = await User.findById(req.user._id)
@@ -248,15 +299,6 @@ const getUserProfile = asyncHandler(async (req, res) => {
 		throw new Error('--> Error: Invalid email or password');
 	}
 });
-
-// Logout user
-// const logoutUser = (req, res) => {
-// 	res.cookie('jwt', '', {
-// 		httpOnly: true,
-// 		expires: new Date(0),
-// 	});
-// 	res.status(200).json({ message: 'Logged out successfully' });
-// };
 
 // Update user details
 async function updateUserDetails(user, requestData) {
@@ -327,6 +369,61 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 	}
 });
 
+const validateAccount = asyncHandler(async (req, res) => {
+	const { verifyToken } = req.params;
+
+	// check the user details
+	const token = await TokenModel.findOne({ token: verifyToken });
+
+	if (!token) {
+		return res.status(400).json({
+			message: 'Invalid token',
+		});
+	}
+
+	const user = await User.findOne({ email: token.email });
+
+	if (!user) {
+		return res.status(400).json({
+			message: 'User does not exist.',
+		});
+	}
+
+	user.isActive = true;
+	await user.save();
+
+	// delete token
+	await TokenModel.deleteOne({ token: token });
+
+	// send email
+	const message = `
+		<h1>You have successfully verified your account</h1>
+		<p>Thank you for verifying your account.</p>
+
+		<p>Regards,</p>
+		<p>Team</p>
+	`;
+
+	try {
+		await sendMail({
+			Recipients: [{ Email: user.email }],
+			Subject: 'Account Verified',
+			HTMLPart: message,
+		});
+
+		return res.status(200).json({
+			success: true,
+			message: 'Account verified!',
+		});
+	} catch (error) {
+		console.log("--> Error: Can't send email", error);
+		return res.status(200).json({
+			success: true,
+			message: 'Account verified!',
+		});
+	}
+});
+
 // for delete user account (deactivate user) up to 7 days
 const deactivateUser = asyncHandler(async (req, res) => {
 	const user = await User.findById(req.user._id);
@@ -342,6 +439,168 @@ const deactivateUser = asyncHandler(async (req, res) => {
 			message: 'User not found',
 		});
 		throw new Error('--> Error: Invalid email or password');
+	}
+});
+
+// ------------------------------ PASSWORD ------------------------------
+
+// changing password
+const updatePassword = asyncHandler(async (req, res) => {
+	const { current_password, new_password, password_confirmation } = req.body;
+	const user = req.user;
+
+	// check for any empty field
+	if (!current_password || !new_password || !password_confirmation) {
+		return res
+			.status(400)
+			.json({ message: 'Please fill all the fields' });
+	}
+
+	// check for the password match
+	if (!user.matchPassword(current_password)) {
+		return res.status(400).json({ message: 'Invalid password' });
+	}
+
+	if (new_password !== password_confirmation) {
+		return res.status(400).json({ message: 'Passwords do not match' });
+	}
+
+	// password encryption
+	const salt = await bcrypt.genSalt(10);
+	user.password = await bcrypt.hash(data.new_password, salt);
+
+	await user.save();
+	return res.json({ message: 'Password changed!' });
+});
+
+// For forgot password (send email)
+const forgotPassword = asyncHandler(async (req, res) => {
+	const { email } = req.body;
+
+	// check the user details
+	if (!email) {
+		return res.status(400).json({
+			message: 'Please fill all the fields',
+		});
+	}
+
+	// check email with regex
+	const emailRegex = /\S+@\S+\.\S+/;
+	if (!emailRegex.test(email)) {
+		return res.status(400).json({
+			message: 'Please enter a valid email',
+		});
+	}
+
+	// Check if user exists with same email or username
+	const user = await User.findOne({
+		$or: [{ email: email }, { username: email }],
+	});
+
+	if (!user) {
+		return res.status(400).json({
+			message: 'Please enter a valid email',
+		});
+	}
+
+	const token = crypto.randomBytes(32).toString('hex');
+	const resetPassword = await TokenModel.create({
+		email: email,
+		token: token,
+	});
+
+	const resetUrl = `${process.env.BASE_URL}/reset-password/${token}`;
+	const message = `
+		<h1>You have requested a password reset</h1>
+		<p>Please go to this link to reset your password</p>
+		<a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+
+		<p>If you did not request a password reset, please ignore this email.</p>
+
+		<p>Regards,</p>
+		<p>Team</p>
+	`;
+	try {
+		await sendMail({
+			Recipients: [{ Email: email }],
+			Subject: 'Password Reset Request',
+			HTMLPart: message,
+		});
+
+		res.status(200).json({
+			success: true,
+			data: 'Email sent',
+		});
+	} catch (error) {
+		console.log("--> Error: Can't send email", error);
+		resetPassword.remove();
+		return res.status(500).json({
+			message: 'Email could not be sent',
+		});
+	}
+});
+
+// For reset password (change password)
+const resetPassword = asyncHandler(async (req, res) => {
+	const { resetToken } = req.params;
+	const { new_password, password_confirmation } = req.body;
+
+	// check for any empty field
+	if (!new_password || !password_confirmation) {
+		return res
+			.status(400)
+			.json({ message: 'Please fill all the fields' });
+	}
+
+	if (new_password !== password_confirmation) {
+		return res.status(400).json({ message: 'Passwords do not match' });
+	}
+
+	const token = await TokenModel.findOne({ token: resetToken });
+
+	if (!token) {
+		return res.status(400).json({ message: 'Invalid token' });
+	}
+
+	const user = await User.findOne({ email: token.email });
+
+	if (!user) {
+		return res.status(400).json({ message: 'User does not exist.' });
+	}
+
+	// password encryption
+	const salt = await bcrypt.genSalt(10);
+	user.password = await bcrypt.hash(new_password, salt);
+
+	await user.save();
+
+	// delete token
+	await TokenModel.deleteOne({ token: resetToken });
+
+	// send email
+	const message = `
+		<h1>You have successfully reset your password</h1>
+		<p>If you did not request a password reset, please contact us immediately.</p>
+
+		<p>Regards,</p>
+		<p>Team</p>
+	`;
+	try {
+		await sendMail({
+			Recipients: [{ Email: user.email }],
+			Subject: 'Password Reset Successful',
+			HTMLPart: message,
+		});
+
+		return res.status(200).json({
+			success: true,
+			message: 'Password changed!',
+		});
+	} catch (error) {
+		console.log("--> Error: Can't send email", error);
+		return res.status(500).json({
+			message: 'Email could not be sent',
+		});
 	}
 });
 
@@ -427,4 +686,7 @@ export {
 	getUserById,
 	updateUser,
 	deactivateUser,
+	updatePassword,
+	forgotPassword,
+	resetPassword,
 };

@@ -36,4 +36,39 @@ const admin = (req, res, next) => {
 	}
 };
 
-export { protect, admin };
+const vendor = (req, res, next) => {
+	if (req.user && req.user.isVendor) {
+		next();
+	} else {
+		res.status(401);
+		throw new Error('--> Error: Not authorized as a vendor');
+	}
+};
+
+const adminOrVendor = (req, res, next) => {
+	if (req.user && (req.user.isAdmin || req.user.isVendor)) {
+		next();
+	} else {
+		res.status(401);
+		throw new Error('--> Error: Not authorized as a vendor or admin');
+	}
+};
+
+// For allowing only vendor to edit their products and admin to edit all products
+const adminOrVendorOrUser = (req, res, next) => {
+	if (
+		req.user &&
+		(req.user.isAdmin ||
+			req.user.isVendor ||
+			req.user._id == req.params.id)
+	) {
+		next();
+	} else {
+		res.status(401);
+		throw new Error(
+			'--> Error: Not authorized as a vendor or admin or user'
+		);
+	}
+};
+
+export { protect, admin, vendor, adminOrVendor };

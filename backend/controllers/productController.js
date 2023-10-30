@@ -1,5 +1,44 @@
-import Product from '../models/productModel.js';
+import {
+	ref,
+	uploadBytes,
+	listAll,
+	deleteObject,
+	getDownloadURL,
+} from 'firebase/storage';
 import asyncHandler from 'express-async-handler';
+
+import Product from '../models/productModel.js';
+
+// Firebase
+import { storage } from '../firebase/firebaseConfig.js';
+
+const uploadImage = async (file) => {
+	try {
+		const imageRef = ref(storage, file.originalname);
+		const metatype = {
+			contentType: file.mimetype,
+			name: file.originalname,
+		};
+		const snapshot = await uploadBytes(imageRef, file.buffer, metatype);
+		const downloadURL = await getDownloadURL(imageRef);
+		return downloadURL;
+		// create public url
+	} catch (error) {
+		console.error(error.message);
+		throw error;
+	}
+};
+
+const deleteImage = async (imageName) => {
+	try {
+		const imageRef = ref(storage, imageName);
+		await deleteObject(imageRef);
+		console.log('Image deleted successfully');
+	} catch (error) {
+		console.error('Error deleting image:', error.message);
+		throw error;
+	}
+};
 
 // Create Endpoint to get all products
 // @route GET /api/v1/products
@@ -24,4 +63,134 @@ const getProductById = asyncHandler(async (req, res) => {
 	}
 });
 
-export { getProducts, getProductById };
+// Create Endpoint to create a product
+// @route POST /api/v1/products
+const createProduct = asyncHandler(async (req, res) => {
+	const { name, price, vendor, category, countInStock, description } =
+		req.body;
+
+	// Validate data
+	if (
+		!name ||
+		!price ||
+		!vendor ||
+		!category ||
+		!countInStock ||
+		!description
+	) {
+		return res.status(400).json({
+			message: 'Please enter all fields',
+		});
+	}
+	// Check if product already exists in the database Check with name and vendor
+	const productExists = await Product.findOne({ name, vendor });
+
+	if (productExists) {
+		return res.status(400).json({
+			message: 'Product already exists',
+		});
+	}
+
+	// Save image to firebase storage and get URL if product does not exist
+	let image_url = '';
+	const file = req.file;
+
+	if (file) {
+		image_url = await uploadImage(file);
+	}
+
+	// Create product
+	const product = new Product({
+		name,
+		price,
+		vendor,
+		category,
+		countInStock,
+		description,
+	});
+
+	if (image_url) {
+		product.image = image_url;
+	} else {
+		// Set default image
+		product.image =
+			'https://firebasestorage.googleapis.com/v0/b/market-hub-1937e.appspot.com/o/default.jpg?alt=media&token=4222dffe-31c0-47de-9c1d-37b2e290dd7c';
+	}
+
+	// Save product to the database
+	try {
+		const createdProduct = await product.save();
+		res.status(201).json(createdProduct);
+	} catch (error) {
+		// Handle error appropriately
+		if (image_url) {
+			await deleteImage(file.originalname);
+		}
+		res.status(500).json({ message: 'Failed to save product' });
+	}
+});
+
+// Create Endpoint to update a product
+// @route PUT /api/v1/products/:id
+
+const updateProduct = asyncHandler(async (req, res) => {
+	const { name, price, vendor, category, countInStock, description } =
+		req.body;
+
+	// Validate data
+	if (
+		!name ||
+		!price ||
+		!vendor ||
+		!category ||
+		!countInStock ||
+		!description
+	) {
+		return res.status(400).json({
+			message: 'Please enter all fields',
+		});
+	}
+
+	// Check if product exists
+	const product = await Product.findById(req.params.id);
+
+	if (!product) {
+		return res.status(404).json({
+			message: 'Product not found',
+		});
+	}
+
+	// Save image to firebase storage and get URL if product does not exist
+	let image_url = '';
+	const file = req.file;
+
+	if (file) {
+		image_url = await uploadImage(file);
+	}
+
+	// Update product
+	product.name = name;
+	product.price = price;
+	product.vendor = vendor;
+	product.category = category;
+	product.countInStock = countInStock;
+	product.description = description;
+
+	if (image_url) {
+		product.image = image_url;
+	}
+
+	// Save product to the database
+	try {
+		const updatedProduct = await product.save();
+		res.status(201).json(updatedProduct);
+	} catch (error) {
+		// Handle error appropriately
+		if (image_url) {
+			await deleteImage(file.originalname);
+		}
+		res.status(500).json({ message: 'Failed to update product' });
+	}
+});
+
+export { getProducts, getProductById, createProduct, updateProduct };

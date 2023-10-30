@@ -11,6 +11,9 @@ import {
 	updateUser,
 	checkEmail,
 	deactivateUser,
+	resetPassword,
+	forgotPassword,
+	updatePassword,
 } from '../controllers/userController.js';
 
 import { protect, admin } from '../middleware/authMiddleware.js';
@@ -22,6 +25,9 @@ router.route('/check').post(checkEmail);
 
 // Base route
 router.route('/').post(registerUser).get(protect, admin, getUsers);
+
+// Verify route
+router.route('/verify/:verifyToken').get(deactivateUser);
 
 // Auth route
 router.post('/auth', authUser);
@@ -35,6 +41,11 @@ router
 	.get(protect, getUserProfile)
 	.put(protect, updateUserProfile)
 	.delete(protect, deactivateUser);
+
+// PASSWORD Route
+router.route('/profile/password').put(protect, updatePassword);
+router.route('/forgot-password').post(forgotPassword);
+router.route('/reset-password/:resetToken').post(resetPassword);
 
 // Admin routes
 router

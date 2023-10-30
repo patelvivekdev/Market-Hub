@@ -12,6 +12,9 @@ node_modules
 # production
 /build
 
+# FIREBASE CONFIG
+market-hub.json
+
 # DATA
 data
 
