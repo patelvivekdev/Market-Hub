@@ -273,14 +273,24 @@ const registerUser = asyncHandler(async (req, res) => {
 
 		generateToken(res, user._id, user.userType);
 
-		res.status(201).json({
-			_id: user._id,
-			email: user.email,
-			username: user.username || user.email,
-			userType: user.userType,
-			isActive: user.isActive,
-			profile: user.profile,
-			message: 'User created successfully',
+		const user_info = await User.findOne({ email }).populate('profile');
+
+		return res.json({
+			_id: user_info._id,
+			email: user_info.email,
+			username: user_info.username || user_info.email,
+			userType: user_info.userType,
+			isActive: user_info.isActive,
+			profile: user_info.profile,
+			fullName:
+				user_info.userType === 'Client'
+					? user_info.profile.clientName
+					: user_info.userType === 'Vendor'
+					? user_info.profile.vendorName
+					: user_info.userType === 'Admin'
+					? user_info.profile.adminName
+					: '',
+			message: 'Account crated successfully',
 		});
 	} else {
 		return res.status(400).json({
