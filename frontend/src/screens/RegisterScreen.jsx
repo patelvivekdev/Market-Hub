@@ -1,20 +1,16 @@
-import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { Form, Button, Row, Col } from 'react-bootstrap';
-import Loader from '../components/Loader';
-import FormContainer from '../components/FormContainer';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-
+import FormContainer from "../components/FormContainer";
+import Loader from "../components/Loader";
+import { useEffect, useState } from "react";
+import { Button, Col, Form, Row } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { setCredentials } from "../slices/authSlice";
+import { useCheckEmailMutation, useRegisterMutation } from "../slices/usersApiSlice";
 
 const RegisterScreen = () => {
 	// access the params passed in the url
 	const { userType } = useParams();
-
-	// check for userType ( Client, Vendor, Admin) are valid
-	if (!['Client', 'Vendor', 'Admin'].includes(userType)) {
-		window.location.href = '/login';
-	}
 
 	const [username, setUsername] = useState('');
 	const [email, setEmail] = useState('');
@@ -30,141 +26,142 @@ const RegisterScreen = () => {
 	const [description, setDescription] = useState('');
 	const [website, setWebsite] = useState('');
 
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
 
-	// for isLoading state
-	const [isLoading, setIsLoading] = useState(false);
+	// check for userType ( Client, Vendor, Admin) are valid
+	if (!['Client', 'Vendor', 'Admin'].includes(userType)) {
+		toast.error('Invalid user type', {
+			onClose: () => {
+				navigate('/');
+			}
+		});
+	}
 
-	// for isError state
-	const [isError, setIsError] = useState(false);
+	const [register, { isLoading }] = useRegisterMutation();
 
-	// create helper method to show toast
+	console.log("EMAIL", email);
+	const [isEmailValid, { isLoading: isEmailValidLoading }] = useCheckEmailMutation();
+
+	const { userInfo } = useSelector((state) => state.auth);
+
+	const { search } = useLocation();
+	const searchParams = new URLSearchParams(search);
+	const redirect = searchParams.get('redirect') || '/';
+
+	useEffect(() => {
+		if (userInfo) {
+			switch (userInfo.userType) {
+				case 'Admin':
+					navigate('/');
+					break;
+				case 'Client':
+					navigate(redirect || '/');
+					break;
+				case 'Vendor':
+					navigate('/products');
+					break;
+				default:
+					break;
+			}
+		}
+	}, [navigate, redirect, userInfo]);
+
 
 	// set toast id
 	const customId = "registerToastId";
 
-	const showToast = (message) => {
+	const showErrorToast = (message) => {
 		toast.error(message, {
 			toastId: customId,
-			autoClose: false,
-			onOpen: () => {
-				setIsError(true);
-				setIsLoading(true);
-			},
-			onClose: clearLoadingState
+			autoClose: 2000,
 		});
 	}
 
-
 	const submitHandler = async (e) => {
-		// setIsLoading(true);
 		e.preventDefault();
+
 		// Check user input
 		if (!username || !email || !password || !confirmPassword) {
-			showToast('Please fill in all fields');
+			showErrorToast('Please fill in all fields');
 			return
 		}
 
 		// check email format
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailRegex.test(email)) {
-			showToast('Please enter a valid email address');
+			showErrorToast('Please enter a valid email address');
 			return
 		}
 
 		// check if email already exists
 		try {
-			const BASE_URL = 'https://market-hub.onrender.com/api/v1';
-			const config = {
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			};
-
-			axios.post(
-				BASE_URL + '/users/check',
-				{ email },
-				config
-			);
-		} catch (err) {
-			// if email already exists
-			if (err?.response?.status === 400) {
-				showToast('Email already exists');
+			const res = await isEmailValid({ email }).unwrap();
+			if (res.found === true) {
+				showErrorToast('Email already exists. Please try again with a different email address.');
 				return
 			}
-			// do nothing
+		} catch (err) {
+			showErrorToast(err?.data?.message || err?.response?.data?.message || 'Something went wrong while checking email! Please try again later.');
+			return
 		}
 
 		// check password regex (at least 8 characters long, contain at least 1 uppercase letter, 1 lowercase letter, and 1 number)
 		const passwordRegex =
 			/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm;
 		if (!passwordRegex.test(password)) {
-			showToast('Password must be at least 8 characters long, contain at least 1 uppercase letter, 1 lowercase letter, and 1 number');
+			showErrorToast('Password must be at least 8 characters long, contain at least 1 uppercase letter, 1 lowercase letter, and 1 number');
 			return
 		}
 
 		// check if passwords match
 		if (password !== confirmPassword) {
-			showToast('Passwords do not match');
+			showErrorToast('Passwords do not match');
 			return
 		}
 
-		if (!isError) {
-			try {
-				const BASE_URL = 'https://market-hub.onrender.com/api/v1';
-				const config = {
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				};
-
-				const { data } = await axios.post(
-					BASE_URL + '/users',
-					{
-						username, email, password, userType, profile: {
-							name,
-							address,
-							phone,
-						}
-					},
-					config
-				);
-				if (data) {
-					setIsLoading(false);
-					localStorage.setItem('userInfo', JSON.stringify(data));
-					toast.success('User Registration successful', {
-						onClose: () => {
-							if (data.userType === 'Client') {
-								window.location.href = '/Client';
-							} else {
-								window.location.href = '/Vendor';
-							}
-						}
-					});
+		try {
+			const userData = {
+				username, email, password, userType, profile: {
+					name,
+					address,
+					phone,
 				}
-				// window.location.href = '/login';
-			} catch (err) {
-				toast.error(err?.data?.message || err?.response?.data?.message || 'Something went wrong while registering user');
+			};
+			const res = await register(userData).unwrap();
+
+			const successMessage = 'Registration successful';
+			toast.success(successMessage, {
+				toastId: customId,
+			});
+
+			dispatch(setCredentials({ ...res }));
+
+			switch (res.userType) {
+				case 'Admin':
+					navigate('/');
+					break;
+				case 'Vendor':
+					navigate('/products');
+					break;
+				default:
+					navigate(redirect);
+					break;
 			}
-			finally {
-				setIsLoading(false);
-			}
+		} catch (err) {
+			showErrorToast(err?.data?.message || err?.response?.data?.message || 'Something went wrong while registering! Please try again later.');
 		}
 	};
-
-	// When user click cancel button on toast message clear the loading state
-	const clearLoadingState = () => {
-		setIsError(false);
-		setIsLoading(false);
-	}
 
 	return (
 		<FormContainer>
 			<h1>Register New {userType}</h1>
 			<Form onSubmit={submitHandler}>
-				<Form.Group className='my-2' controlId='name'>
-					<Form.Label>Name</Form.Label>
+				<Form.Group className='my-2' controlId='username'>
+					<Form.Label>Username</Form.Label>
 					<Form.Control
 						type='name'
+						disabled={isLoading}
 						placeholder='Enter username'
 						value={username}
 						onChange={(e) => {
@@ -177,6 +174,7 @@ const RegisterScreen = () => {
 					<Form.Label>Email Address</Form.Label>
 					<Form.Control
 						type='email'
+						disabled={isLoading}
 						placeholder='Enter email'
 						value={email}
 						onChange={
@@ -190,6 +188,7 @@ const RegisterScreen = () => {
 					<Form.Control
 						type='password'
 						placeholder='Enter password'
+						disabled={isLoading}
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}
 						aria-describedby="passwordHelpBlock"
@@ -203,6 +202,7 @@ const RegisterScreen = () => {
 					<Form.Control
 						type='password'
 						placeholder='Confirm password'
+						disabled={isLoading}
 						value={confirmPassword}
 						onChange={(e) => setConfirmPassword(e.target.value)}
 					></Form.Control>
@@ -217,10 +217,11 @@ const RegisterScreen = () => {
 				{userType === 'Client' && (
 					<>
 						<Form.Group className='my-2' controlId='name'>
-							<Form.Label>{userType} Name</Form.Label>
+							<Form.Label>{userType}Name</Form.Label>
 							<Form.Control
 								type='name'
 								placeholder='Enter name'
+								disabled={isLoading}
 								value={name}
 								onChange={(e) => setName(e.target.value)}
 							></Form.Control>
@@ -230,6 +231,7 @@ const RegisterScreen = () => {
 							<Form.Control
 								type='address'
 								placeholder='Enter address'
+								disabled={isLoading}
 								value={address}
 								onChange={(e) => setAddress(e.target.value)}
 							></Form.Control>
@@ -239,9 +241,14 @@ const RegisterScreen = () => {
 							<Form.Control
 								type='phone'
 								placeholder='Enter phone'
+								disabled={isLoading}
 								value={phone}
+								aria-describedby="phoneHelpBlock"
 								onChange={(e) => setPhone(e.target.value)}
 							></Form.Control>
+							<Form.Text id="phoneHelpBlock" muted>
+								Phone number must be unique.
+							</Form.Text>
 						</Form.Group>
 					</>
 				)}
@@ -258,6 +265,7 @@ const RegisterScreen = () => {
 							<Form.Control
 								type='name'
 								placeholder='Enter name'
+								disabled={isLoading}
 								value={name}
 								onChange={(e) => setName(e.target.value)}
 							></Form.Control>
@@ -267,6 +275,7 @@ const RegisterScreen = () => {
 							<Form.Control
 								type='address'
 								placeholder='Enter address'
+								disabled={isLoading}
 								value={address}
 								onChange={(e) => setAddress(e.target.value)}
 							></Form.Control>
@@ -274,17 +283,23 @@ const RegisterScreen = () => {
 						<Form.Group className='my-2' controlId='phone'>
 							<Form.Label>Phone</Form.Label>
 							<Form.Control
-								type='number'
+								type='phone'
 								placeholder='Enter phone'
+								disabled={isLoading}
 								value={phone}
+								aria-describedby="phoneHelpBlock"
 								onChange={(e) => setPhone(e.target.value)}
 							></Form.Control>
+							<Form.Text id="phoneHelpBlock" muted>
+								Phone number must be unique.
+							</Form.Text>
 						</Form.Group>
 						<Form.Group className='my-2' controlId='description'>
 							<Form.Label>Description</Form.Label>
 							<Form.Control
 								type='description'
 								placeholder='Enter description'
+								disabled={isLoading}
 								value={description}
 								onChange={(e) => setDescription(e.target.value)}
 							></Form.Control>
@@ -294,6 +309,7 @@ const RegisterScreen = () => {
 							<Form.Control
 								type='website'
 								placeholder='Enter website'
+								disabled={isLoading}
 								value={website}
 								onChange={(e) => setWebsite(e.target.value)}
 							></Form.Control>
@@ -309,6 +325,7 @@ const RegisterScreen = () => {
 							<Form.Control
 								type='address'
 								placeholder='Enter address'
+								disabled={isLoading}
 								value={address}
 								onChange={(e) => setAddress(e.target.value)}
 							></Form.Control>
@@ -318,17 +335,24 @@ const RegisterScreen = () => {
 							<Form.Control
 								type='phone'
 								placeholder='Enter phone'
+								disabled={isLoading}
 								value={phone}
+								aria-describedby="phoneHelpBlock"
 								onChange={(e) => setPhone(e.target.value)}
 							></Form.Control>
+							<Form.Text id="phoneHelpBlock" muted>
+								Phone number must be unique.
+							</Form.Text>
 						</Form.Group>
 					</>
 				)}
 
 
-				<Button disabled={isError} type='submit' variant='primary'>
+				<Button disabled={isLoading} type='submit' variant='primary'>
 					Register
 				</Button>
+
+				{isEmailValidLoading && <Loader />}
 
 				{isLoading && <Loader />}
 			</Form>

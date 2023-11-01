@@ -1,10 +1,12 @@
 import express from 'express';
+import { uploader } from '../middleware/uploadMiddleware.js';
 
 // import from Product Controller
 import {
 	getProducts,
 	getProductById,
 	createProduct,
+	getProductsByVendor,
 } from '../controllers/productController.js';
 
 import {
@@ -13,12 +15,14 @@ import {
 	adminOrVendor,
 	vendor,
 } from '../middleware/authMiddleware.js';
-import { uploader } from '../middleware/uploadMiddleware.js';
 
 const router = express.Router();
 
 // Base route
-router.route('/').get(getProducts).post(adminOrVendor, uploader, createProduct);
+router
+	.route('/')
+	.get(getProducts)
+	.post(protect, vendor, uploader, createProduct);
 
 // Product route
 router.route('/:id').get(getProductById);
@@ -28,5 +32,8 @@ router.route('/:id').get(getProductById);
 
 // Delete product route
 // router.route('/:id').delete(protect, adminOrVendor, deleteProduct);
+
+// get all products by vendor id
+router.route('/vendor/:id').get(getProductsByVendor);
 
 export default router;

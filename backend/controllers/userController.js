@@ -11,6 +11,8 @@ import TokenModel from '../models/tokenModel.js';
 import User from '../models/userModel.js';
 import Vendor from '../models/vendorModel.js';
 
+import { uploadImage, deleteImage } from '../utils/firebase.js';
+
 dotenv.config();
 
 // ------------------------------ EMAIL CHECK ------------------------
@@ -18,27 +20,26 @@ dotenv.config();
 // Check user email for login
 const checkEmail = asyncHandler(async (req, res) => {
 	const { email } = req.body;
-
 	const user = await User.findOne({ email });
 
 	if (user) {
-		return res.status(400).json({
+		return res.status(200).json({
 			found: true,
 			email: email,
-			message: 'User already exists',
+			message: 'User already exists.',
 		});
 	} else {
 		return res.status(200).json({
 			found: false,
 			email: email,
-			message: 'User not found',
+			message: 'User not found.',
 		});
 	}
 });
 
 // ------------------------------ AUTH ------------------------------
 
-// Auth user & get token
+// Auth user & send token in Cookie
 const authUser = asyncHandler(async (req, res) => {
 	const { email, password } = req.body;
 
@@ -52,13 +53,23 @@ const authUser = asyncHandler(async (req, res) => {
 	const user = await User.findOne({ email }).populate('profile');
 
 	if (user && (await user.matchPassword(password))) {
+		generateToken(res, user._id, user.userType);
+
 		return res.json({
 			_id: user._id,
 			email: user.email,
 			username: user.username || user.email,
 			userType: user.userType,
-			token: generateToken(user._id, user.userType),
+			isActive: user.isActive,
 			profile: user.profile,
+			fullName:
+				user.userType === 'Client'
+					? user.profile.clientName
+					: user.userType === 'Vendor'
+					? user.profile.vendorName
+					: user.userType === 'Admin'
+					? user.profile.adminName
+					: '',
 			message: 'User logged in successfully',
 		});
 	} else {
@@ -98,14 +109,13 @@ const registerUser = asyncHandler(async (req, res) => {
 
 	// Check if user exists with same email or username
 	const userExists = await User.findOne({
-		$or: [{ email: email }, { username: email }],
+		$or: [{ email: email }, { username: username }],
 	});
 
 	if (userExists) {
 		return res.status(400).json({
-			message: 'User already exists',
+			message: 'User with this username or email already exists.',
 		});
-		throw new Error('--> Error: User already exists.');
 	}
 
 	// Create user profile
@@ -134,7 +144,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 		if (clientExists) {
 			return res.status(400).json({
-				message: 'Client already exists',
+				message: 'User already exists with this phone number.',
 			});
 		} else {
 			userDetails = await Client.create({
@@ -167,7 +177,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 		if (vendorExists) {
 			return res.status(400).json({
-				message: 'Vendor already exists',
+				message: 'User already exists with this phone number.',
 			});
 		} else {
 			userDetails = await Vendor.create({
@@ -195,7 +205,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 		if (adminExists) {
 			return res.status(400).json({
-				message: 'Admin already exists',
+				message: 'User already exists with this phone number.',
 			});
 		} else {
 			userDetails = await Admin.create({
@@ -261,11 +271,15 @@ const registerUser = asyncHandler(async (req, res) => {
 			console.log("--> Error: Can't send email", error);
 		}
 
+		generateToken(res, user._id, user.userType);
+
 		res.status(201).json({
 			_id: user._id,
-			username: user.username,
 			email: user.email,
-			token: generateToken(user._id, user.userType),
+			username: user.username || user.email,
+			userType: user.userType,
+			isActive: user.isActive,
+			profile: user.profile,
 			message: 'User created successfully',
 		});
 	} else {
@@ -275,14 +289,14 @@ const registerUser = asyncHandler(async (req, res) => {
 	}
 });
 
-// Logout user
-// const logoutUser = (req, res) => {
-// 	res.cookie('jwt', '', {
-// 		httpOnly: true,
-// 		expires: new Date(0),
-// 	});
-// 	res.status(200).json({ message: 'Logged out successfully' });
-// };
+// Logout user & clear cookie
+const logoutUser = (req, res) => {
+	res.cookie('jwt', '', {
+		httpOnly: true,
+		expires: new Date(0),
+	});
+	return res.status(200).json({ message: 'Logged out successfully.' });
+};
 
 // ------------------------------ Profile ------------------------------
 
@@ -291,12 +305,12 @@ const getUserProfile = asyncHandler(async (req, res) => {
 	const user = await User.findById(req.user._id)
 		.populate('profile')
 		.select('-password');
-
 	if (user) {
 		res.json(user);
 	} else {
-		res.status(401);
-		throw new Error('--> Error: Invalid email or password');
+		return res.status(401).json({
+			message: 'User not found',
+		});
 	}
 });
 
@@ -330,6 +344,10 @@ async function updateUserProfileDetails(user, userType, requestData) {
 		userDetails.phone = requestData.profile.phone || userDetails.phone;
 		userDetails.address =
 			requestData.profile.address || userDetails.address;
+		userDetails.profilePic =
+			requestData.profile.profilePic ||
+			userDetails.profilePic ||
+			'https://firebasestorage.googleapis.com/v0/b/market-hub-1937e.appspot.com/o/profile.jpg?alt=media&token=4222dffe-31c0-47de-9c1d-37b2e290dd7c';
 		await userDetails.save();
 	}
 
@@ -357,10 +375,57 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 				message: 'User profile updated successfully',
 			});
 		} else {
-			res.status(401).json({
+			return res.status(401).json({
 				message: 'User not found',
 			});
-			throw new Error('--> Error: Invalid email or password');
+		}
+	} else {
+		return res.status(401).json({
+			message: 'User not found',
+		});
+	}
+});
+
+const uploadProfilePic = asyncHandler(async (req, res) => {
+	const user = await User.findById(req.user._id);
+	const userType = req.user.userType;
+
+	if (user) {
+		let image_url = '';
+		const file = req.file;
+
+		if (file) {
+			image_url = await uploadImage(file);
+			let userDetails;
+
+			if (userType === 'Client') {
+				userDetails = await Client.findById(user.profile);
+			} else if (userType === 'Vendor') {
+				userDetails = await Vendor.findById(user.profile);
+			} else if (userType === 'Admin') {
+				userDetails = await Admin.findById(user.profile);
+			}
+
+			if (userDetails) {
+				userDetails.profilePic = image_url;
+				await userDetails.save();
+
+				res.status(200).json({
+					_id: userDetails._id,
+					username: user.username,
+					email: user.email,
+					profile: userDetails,
+					message: 'Profile picture updated successfully',
+				});
+			} else {
+				return res.status(401).json({
+					message: 'User not found',
+				});
+			}
+		} else {
+			return res.status(400).json({
+				message: 'Please upload a file',
+			});
 		}
 	} else {
 		return res.status(401).json({
@@ -393,7 +458,7 @@ const validateAccount = asyncHandler(async (req, res) => {
 	await user.save();
 
 	// delete token
-	await TokenModel.deleteOne({ token: token });
+	await TokenModel.deleteOne({ token: verifyToken });
 
 	// send email
 	const message = `
@@ -608,7 +673,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 
 // Get all users
 const getUsers = asyncHandler(async (req, res) => {
-	const users = await User.find({});
+	const users = await User.find({}).populate('profile');
 	res.json(users);
 });
 
@@ -689,4 +754,7 @@ export {
 	updatePassword,
 	forgotPassword,
 	resetPassword,
+	validateAccount,
+	logoutUser,
+	uploadProfilePic,
 };

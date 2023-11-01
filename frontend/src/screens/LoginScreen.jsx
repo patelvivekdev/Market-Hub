@@ -1,134 +1,135 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Row, Col, Container, Modal, Button, Form } from 'react-bootstrap';
-import FormContainer from '../components/FormContainer';
-import Loader from '../components/Loader';
-import { toast } from 'react-toastify';
-import axios from 'axios';
-
+import FormContainer from "../components/FormContainer";
+import Loader from "../components/Loader";
+import { useEffect, useState } from "react";
+import { Button, Col, Form, Row } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { setCredentials } from "../slices/authSlice";
+import { useLoginMutation } from "../slices/usersApiSlice";
 
 const LoginScreen = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
+	const [login, { isLoading }] = useLoginMutation();
+	const { userInfo } = useSelector((state) => state.auth);
+	const { search } = useLocation();
+	const searchParams = new URLSearchParams(search);
+	const redirect = searchParams.get('redirect');
 
-	// for isLoading state
-	const [isLoading, setIsLoading] = useState(false);
+	useEffect(() => {
+		if (userInfo) {
+			switch (userInfo.userType) {
+				case 'Admin':
+					navigate('/');
+					break;
+				case 'Client':
+					navigate(redirect || '/');
+					break;
+				case 'Vendor':
+					navigate('/products');
+					break;
+				default:
+					break;
+			}
+		}
+	}, [navigate, redirect, userInfo]);
 
-	// for isError state
-	const [isError, setIsError] = useState(false);
-
-	// set toast id
-	const customId = "loginToastId";
-
-	const showToast = (message) => {
+	const showErrorToast = (message, toastId) => {
 		toast.error(message, {
-			toastId: customId,
-			autoClose: false,
-			onOpen: () => {
-				setIsError(true);
-				setIsLoading(true);
-			},
-			onClose: clearLoadingState
+			toastId: toastId,
+			autoClose: 2000,
 		});
-	}
-
-	const clearLoadingState = () => {
-		setIsError(false);
-		setIsLoading(false);
-	}
-
+	};
 
 	const submitHandler = async (e) => {
 		e.preventDefault();
 
 		if (!email || !password) {
-			showToast('Please fill in all fields!');
+			showErrorToast('Please fill in all fields!', 'loginToastId');
 			return;
 		}
 
-		// check email format
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailRegex.test(email)) {
-			showToast('Please enter a valid email address!');
-			return
+			showErrorToast('Please enter a valid email address!', 'loginToastId');
+			return;
 		}
 
-		if (!isError) {
-			try {
-				const BASE_URL = 'https://market-hub.onrender.com/api/v1';
-				const config = {
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				};
+		try {
+			const res = await login({ email, password }).unwrap();
 
-				const { data } = await axios.post(
-					BASE_URL +
-					'/users/auth',
-					{ email, password },
-					config
-				);
+			if (redirect === '/shipping' && res.userType !== 'Client') {
+				showErrorToast('You are not authorized to access this page!', 'loginToastId3');
+				return;
+			}
 
-				if (data) {
-					localStorage.setItem('userInfo', JSON.stringify(data));
-					toast.success('Login successful');
-					// clear form
-					setEmail('');
-					setPassword('');
-					if (data.userType === 'Admin') {
-						window.location.href = '/products';
-					} else {
-						window.location.href = '/';
-					}
-				}
-			} catch (err) {
-				toast.error(err?.data?.message || err?.response?.data?.message || 'Something went wrong while login! Please try again later.');
+			const successMessage = 'Login successful';
+			toast.success(successMessage, {
+				toastId: 'loginToastId2',
+			});
+
+			dispatch(setCredentials({ ...res }));
+
+			switch (res.userType) {
+				case 'Admin':
+					navigate('/');
+					break;
+				case 'Vendor':
+					navigate('/products');
+					break;
+				default:
+					navigate(redirect);
+					break;
 			}
-			finally {
-				setIsLoading(false);
-			}
+		} catch (err) {
+			showErrorToast(
+				err?.data?.message || err?.response?.data?.message || 'Something went wrong while login! Please try again later.',
+				'loginToastId'
+			);
 		}
 	};
 
 	return (
 		<FormContainer>
 			<h1>Sign In</h1>
-
 			<Form onSubmit={submitHandler}>
 				<Form.Group className='my-2' controlId='email'>
 					<Form.Label>Email Address</Form.Label>
 					<Form.Control
 						type='email'
 						placeholder='Enter email'
+						disabled={isLoading}
 						value={email}
 						onChange={(e) => setEmail(e.target.value)}
-					></Form.Control>
+					/>
 				</Form.Group>
-
 				<Form.Group className='my-2' controlId='password'>
 					<Form.Label>Password</Form.Label>
 					<Form.Control
 						type='password'
+						disabled={isLoading}
 						placeholder='Enter password'
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}
-					></Form.Control>
+					/>
 				</Form.Group>
-
-				<Button type='submit' variant='primary'>
+				<Button type='submit' variant='primary' disabled={isLoading}>
 					Sign In
 				</Button>
-
 				{isLoading && <Loader />}
 			</Form>
-
 			<Row className='py-3'>
 				<Col>
 					New Customer?{' '}
 					<Button
 						variant='light'
 						className='btn btn-outline-primary ms-2'
-						onClick={() => window.location.href = 'Client/register'}
+						onClick={() =>
+							redirect ? navigate(`/Client/register?redirect=${redirect}`) : navigate('/Client/register')
+						}
 					>
 						Register as Client
 					</Button>{' '}
@@ -136,7 +137,13 @@ const LoginScreen = () => {
 					<Button
 						variant='light'
 						className='btn btn-outline-secondary ms-2'
-						onClick={() => window.location.href = 'Vendor/register'}
+						onClick={() => {
+							if (redirect === '/shipping') {
+								showErrorToast('Please login as a Client to continue!', 'loginToastId3');
+							} else {
+								redirect ? navigate(`/Vendor/register?redirect=${redirect}`) : navigate('/Vendor/register');
+							}
+						}}
 					>
 						Register as vendor
 					</Button>

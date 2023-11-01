@@ -1,44 +1,7 @@
-import {
-	ref,
-	uploadBytes,
-	listAll,
-	deleteObject,
-	getDownloadURL,
-} from 'firebase/storage';
 import asyncHandler from 'express-async-handler';
-
 import Product from '../models/productModel.js';
 
-// Firebase
-import { storage } from '../firebase/firebaseConfig.js';
-
-const uploadImage = async (file) => {
-	try {
-		const imageRef = ref(storage, file.originalname);
-		const metatype = {
-			contentType: file.mimetype,
-			name: file.originalname,
-		};
-		const snapshot = await uploadBytes(imageRef, file.buffer, metatype);
-		const downloadURL = await getDownloadURL(imageRef);
-		return downloadURL;
-		// create public url
-	} catch (error) {
-		console.error(error.message);
-		throw error;
-	}
-};
-
-const deleteImage = async (imageName) => {
-	try {
-		const imageRef = ref(storage, imageName);
-		await deleteObject(imageRef);
-		console.log('Image deleted successfully');
-	} catch (error) {
-		console.error('Error deleting image:', error.message);
-		throw error;
-	}
-};
+import { uploadImage, deleteImage } from '../utils/firebase.js';
 
 // Create Endpoint to get all products
 // @route GET /api/v1/products
@@ -193,4 +156,20 @@ const updateProduct = asyncHandler(async (req, res) => {
 	}
 });
 
-export { getProducts, getProductById, createProduct, updateProduct };
+// Create Endpoint to get all products by a vendor
+// @route GET /api/v1/products/vendor/:id
+
+const getProductsByVendor = asyncHandler(async (req, res) => {
+	const products = await Product.find({ vendor: req.params.id }).populate(
+		'vendor'
+	);
+	res.json(products);
+});
+
+export {
+	getProducts,
+	getProductById,
+	createProduct,
+	updateProduct,
+	getProductsByVendor,
+};

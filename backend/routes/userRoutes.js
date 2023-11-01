@@ -1,5 +1,7 @@
 import express from 'express';
 
+import { admin, protect } from '../middleware/authMiddleware.js';
+
 import {
 	authUser,
 	registerUser,
@@ -14,9 +16,12 @@ import {
 	resetPassword,
 	forgotPassword,
 	updatePassword,
+	validateAccount,
+	logoutUser,
+	uploadProfilePic,
 } from '../controllers/userController.js';
 
-import { protect, admin } from '../middleware/authMiddleware.js';
+import { uploader } from '../middleware/uploadMiddleware.js';
 
 const router = express.Router();
 
@@ -27,13 +32,13 @@ router.route('/check').post(checkEmail);
 router.route('/').post(registerUser).get(protect, admin, getUsers);
 
 // Verify route
-router.route('/verify/:verifyToken').get(deactivateUser);
+router.route('/verify/:verifyToken').get(validateAccount);
 
 // Auth route
 router.post('/auth', authUser);
 
 // Logout route
-// router.post('/logout', logoutUser);
+router.post('/logout', logoutUser);
 
 // Profile route (for logged in user)
 router
@@ -41,6 +46,9 @@ router
 	.get(protect, getUserProfile)
 	.put(protect, updateUserProfile)
 	.delete(protect, deactivateUser);
+
+// Profile pic route
+router.route('/profile/pic').put(protect, uploader, uploadProfilePic);
 
 // PASSWORD Route
 router.route('/profile/password').put(protect, updatePassword);

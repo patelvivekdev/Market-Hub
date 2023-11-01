@@ -1,50 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { Table, Button, Row, Col } from 'react-bootstrap';
-import Loader from '../components/Loader';
-import { toast } from 'react-toastify';
-import axios from 'axios';
+import Img from "../components/Image";
+import Loader from "../components/Loader";
+import { Button, Col, Image, Row, Table } from "react-bootstrap";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { useGetProductsByVendorQuery } from "../slices/productsApiSlice";
 
 const ProductsScreen = () => {
-	const [products, setProducts] = useState([]);
-	const [isLoading, setIsLoading] = useState(true); // Start with loading state
-	const [isError, setIsError] = useState(null); // Use null to represent no error
+
+	const navigate = useNavigate();
 
 	const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 	const userType = userInfo?.userType;
 
+	const vendorId = userInfo?.profile?._id;
 
-	useEffect(() => {
-
-		const fetchProducts = async () => {
-			try {
-				const BASE_URL = 'https://market-hub.onrender.com/api/v1';
-				const config = {
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				};
-
-				const response = await axios.get(
-					`${BASE_URL}/products/`,
-					config
-				);
-				setProducts(response.data);
-				setIsLoading(false); // Set loading to false after successful fetch
-			} catch (error) {
-				toast.error(error.response?.data?.message || 'An error occurred', {
-					autoClose: false,
-					onClose: () => {
-						setIsError(null); // Clear error message
-						setIsLoading(false); // Set loading to false after error
-					},
-				});
-				setIsLoading(false); // Set loading to false after error
-				setIsError('Failed to load products'); // Set error message
-			}
-		};
-
-		fetchProducts();
-	}, []);
+	const { data: products, isLoading, isError } = useGetProductsByVendorQuery(vendorId);
 
 	return (
 		<>
@@ -69,11 +39,13 @@ const ProductsScreen = () => {
 					<thead>
 						<tr>
 							<th>ID</th>
+							<th>Image</th>
 							<th>NAME</th>
 							<th>PRICE</th>
 							<th>CATEGORY</th>
-							<th>VENDOR</th>
-							{userType === "Admin" && <th></th>}
+							<th>Qty</th>
+							<th>Edit</th>
+							<th>Delete</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -83,32 +55,41 @@ const ProductsScreen = () => {
 									<Button
 										variant='dark'
 										onClick={() =>
-											window.location.href = '/products/' + product._id
+											navigate(`/products/${product._id}`)
 										}
 									>
 										{product._id}
 									</Button>
 								</td>
+								<td>
+									<Image
+										style={{ width: '100px' }}
+										src={product.image}
+										alt={product.name}
+										fluid
+										rounded
+									/>
+								</td>
 								<td>{product.name}</td>
 								<td>${product.price}</td>
 								<td>{product.category}</td>
-								<td>{product.vendor.vendorName}</td>
-								{userType === "Admin" && (
-									<td>
-										<Button
-											variant='light'
-											className='btn btn-outline-primary ms-2'
-											onClick={() => {
-												console.log('Edit');
-											}}
-										>
-											<i className='fas fa-edit'>EDIT</i>
-										</Button>
-										<Button variant='light' className='btn btn-outline-danger ms-2'>
-											<i className='fas fa-trash'>DELETE</i>
-										</Button>
-									</td>
-								)}
+								<td>{product.countInStock}</td>
+								<td>
+									<Button
+										variant='light'
+										className='btn'
+										onClick={() =>
+											navigate(`/products/${product._id}/edit`)
+										}
+									>
+										<FaEdit />
+									</Button>
+								</td>
+								<td>
+									<Button variant='danger' className='btn'>
+										<FaTrash />
+									</Button>
+								</td>
 							</tr>
 						))}
 					</tbody>

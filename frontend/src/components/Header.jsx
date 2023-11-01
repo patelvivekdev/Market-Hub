@@ -1,30 +1,46 @@
-import React, { useState } from 'react';
-import { Navbar, Nav, Container, Modal, Button, Form } from 'react-bootstrap';
-import { FaShoppingCart, FaUser, FaUserPlus } from 'react-icons/fa';
-import { BiLogOut } from 'react-icons/bi';
-
-import { MdProductionQuantityLimits } from 'react-icons/md';
-import { LinkContainer } from 'react-router-bootstrap';
-import { toast } from 'react-toastify';
+import React, { useState } from "react";
+import { Badge, Button, Container, Form, Modal, Nav, NavDropdown, Navbar } from "react-bootstrap";
+import { BiLogOut } from "react-icons/bi";
+import { FaShoppingCart, FaUser, FaUserPlus } from "react-icons/fa";
+import { MdProductionQuantityLimits } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
+import { LinkContainer } from "react-router-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { logout } from "../slices/authSlice";
+import { resetCart } from "../slices/cartSlice";
+import { useLogoutMutation } from "../slices/usersApiSlice";
 
 const Header = () => {
+  const { cartItems } = useSelector((state) => state.cart);
 
-  // get the user info from the local storage
-  const userInfo = localStorage.getItem('userInfo');
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  // if the user is logged in, get the user info from the local storage
-  const user = JSON.parse(userInfo);
+  const [logoutApiCall] = useLogoutMutation();
 
-  const logoutHandler = () => {
-    toast.success('Logged out successfully');
-    localStorage.removeItem('userInfo');
-    window.location.href = '/login';
+  const { userInfo } = useSelector((state) => state.auth);
+
+  const logoutHandler = async () => {
+    try {
+      await logoutApiCall().unwrap();
+      dispatch(logout());
+      dispatch(resetCart());
+      toast.success('Logged out successfully', {
+        customId: 'logoutToastId',
+        autoClose: 1000,
+      });
+      navigate('/login');
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   const [showModal, setShowModal] = useState(false);
-  const [selectedRole, setSelectedRole] = useState('Client');
+  const [selectedRole, setSelectedRole] = useState('');
 
   const handleShowModal = () => {
+    setSelectedRole('Client');
     setShowModal(true);
   };
 
@@ -39,9 +55,9 @@ const Header = () => {
   const handleRegister = () => {
     // Based on the selected role, redirect to the corresponding registration page
     if (selectedRole === 'Client') {
-      window.location.href = 'Client/register';
+      navigate('/Client/register');
     } else if (selectedRole === 'Vendor') {
-      window.location.href = 'Vendor/register';
+      navigate('/Vendor/register');
     }
 
     // Close the modal
@@ -60,16 +76,42 @@ const Header = () => {
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
           <Navbar.Collapse id='basic-navbar-nav'>
             <Nav className='ms-auto'>
-              {user ? (
+              {/* Client Links */}
+              {userInfo && userInfo.userType === 'Client' && (
                 <>
-                  <LinkContainer to='/products'>
+                  <LinkContainer to='/cart'>
+                    <Nav.Link>
+                      <FaShoppingCart />
+                      {cartItems.length > 0 && (
+                        <Badge pill bg='primary' style={{ marginLeft: '5px' }}>
+                          {cartItems.reduce((a, c) => a + c.qty, 0)}
+                        </Badge>
+                      )}
+                    </Nav.Link>
+                  </LinkContainer>
+                </>
+              )}
+
+              {/* Vendor Links */}
+              {userInfo && userInfo.userType === 'Vendor' && (
+                <>
+                  <LinkContainer to='/Vendor/products'>
                     <Nav.Link>
                       <MdProductionQuantityLimits /> Products
                     </Nav.Link>
                   </LinkContainer>
-                  <LinkContainer to='/profile'>
+                  {/* <LinkContainer to='/vendor/orderlist'>
+                    <Nav.Link>Orders</Nav.Link>
+                  </LinkContainer> */}
+                </>
+              )}
+
+              {/* User Links */}
+              {userInfo ? (
+                <>
+                  <LinkContainer to={userInfo.userType + "/profile"}>
                     <Nav.Link>
-                      <FaUser /> {user.username}
+                      <FaUser /> {userInfo.username}
                     </Nav.Link>
                   </LinkContainer>
                   <LinkContainer to='/login' onClick={logoutHandler}>
@@ -112,13 +154,30 @@ const Header = () => {
                       </Button>
                     </Modal.Footer>
                   </Modal>
+                  <LinkContainer to='/about'>
+                    <Nav.Link>
+                      <FaUser /> About Us
+                    </Nav.Link>
+                  </LinkContainer>
                 </>
+              )}
+
+              {/* Admin Links */}
+              {userInfo && userInfo.userType === 'Admin' && (
+                <NavDropdown title='Admin' id='adminmenu'>
+                  <LinkContainer to='/Admin/productlist'>
+                    <NavDropdown.Item>Products</NavDropdown.Item>
+                  </LinkContainer>
+                  <LinkContainer to='/Admin/userlist'>
+                    <NavDropdown.Item>Users</NavDropdown.Item>
+                  </LinkContainer>
+                </NavDropdown>
               )}
             </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
-    </header>
+    </header >
   );
 };
 

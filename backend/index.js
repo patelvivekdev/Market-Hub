@@ -1,14 +1,16 @@
-// Imports
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
 import path from 'path';
 
-import { firebaseApp } from './firebase/firebaseConfig.js';
+import { forgotPassword } from './controllers/userController.js';
+import categoryRoutes from './routes/categoryRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-import { forgotPassword } from './controllers/userController.js';
+
+// Imports
 
 // dotenv config
 dotenv.config();
@@ -28,14 +30,17 @@ try {
 // Init express
 const app = express();
 
-app.use(cors());
 // Middleware
+// app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Routes
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/products', productRoutes);
+app.use('/api/v1/categories', categoryRoutes);
+
 app.post('reset-password', forgotPassword);
 
 if (process.env.NODE_ENV === 'production') {
