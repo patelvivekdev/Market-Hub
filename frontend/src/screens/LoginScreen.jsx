@@ -29,7 +29,7 @@ const LoginScreen = () => {
 					navigate(redirect || '/');
 					break;
 				case 'Vendor':
-					navigate('/products');
+					navigate('/Vendor/products');
 					break;
 				default:
 					break;
@@ -78,7 +78,7 @@ const LoginScreen = () => {
 					navigate('/');
 					break;
 				case 'Vendor':
-					navigate('/products');
+					navigate('/Vendor/products');
 					break;
 				default:
 					navigate(redirect);

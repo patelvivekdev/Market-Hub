@@ -184,6 +184,8 @@ const registerUser = asyncHandler(async (req, res) => {
 				vendorName: profile.name,
 				phone: profile.phone,
 				address: profile.address,
+				website: profile.website || '',
+				description: profile.description || '',
 			});
 		}
 	} else if (userType === 'Admin') {

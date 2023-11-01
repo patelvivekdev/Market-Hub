@@ -40,7 +40,6 @@ const RegisterScreen = () => {
 
 	const [register, { isLoading }] = useRegisterMutation();
 
-	console.log("EMAIL", email);
 	const [isEmailValid, { isLoading: isEmailValidLoading }] = useCheckEmailMutation();
 
 	const { userInfo } = useSelector((state) => state.auth);
@@ -59,7 +58,7 @@ const RegisterScreen = () => {
 					navigate(redirect || '/');
 					break;
 				case 'Vendor':
-					navigate('/products');
+					navigate('/Vendor/products');
 					break;
 				default:
 					break;
@@ -142,7 +141,7 @@ const RegisterScreen = () => {
 					navigate('/');
 					break;
 				case 'Vendor':
-					navigate('/products');
+					navigate('/Vendor/products');
 					break;
 				default:
 					navigate(redirect);

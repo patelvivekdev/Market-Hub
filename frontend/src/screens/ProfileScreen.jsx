@@ -15,7 +15,7 @@ const ProfileScreen = () => {
 
   return (
     <Row>
-      <Col md={6} className="mt-4">
+      <Col md={5} className="mt-4">
         <h2>User Profile</h2>
 
         <Row className="mb-3">
@@ -34,7 +34,46 @@ const ProfileScreen = () => {
         </Row>
       </Col>
 
-      <Col md={6} className="text-center mt-4">
+      {
+        userInfo.userType === "Vendor" && (
+          <Col md={4} className="mt-4">
+            <h2>Vendor Profile</h2>
+            <Row className="mb-3">
+              <Col md={3} className="fw-bold">Company Address:</Col>
+              <Col md={9}>{userInfo.profile?.address}</Col>
+            </Row>
+
+            <Row className="mb-3">
+              <Col md={3} className="fw-bold">Company Phone:</Col>
+              <Col md={9}>{userInfo.profile?.phone}</Col>
+            </Row>
+
+            <Row className="mb-3">
+              <Col md={3} className="fw-bold">Company website:</Col>
+              <Col md={9}>{userInfo.profile?.website}</Col>
+            </Row>
+          </Col>
+        )
+      }
+
+      {
+        userInfo.userType === "Client" && (
+          <Col md={4} className="mt-4">
+            <h2>Client Profile</h2>
+            <Row className="mb-3">
+              <Col md={3} className="fw-bold">Address:</Col>
+              <Col md={9}>{userInfo.profile?.address}</Col>
+            </Row>
+
+            <Row className="mb-3">
+              <Col md={3} className="fw-bold">Phone:</Col>
+              <Col md={9}>{userInfo.profile?.phone}</Col>
+            </Row>
+          </Col>
+        )
+      }
+
+      <Col md={3} className="text-center mt-4">
         <Image
           src={userInfo.profile?.profilePic}
           alt={userInfo.fullName}
