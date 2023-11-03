@@ -1,7 +1,7 @@
 import asyncHandler from 'express-async-handler';
-import Product from '../models/productModel.js';
 
 import { uploadImage, deleteImage } from '../utils/firebase.js';
+import Product from '../models/productModel.js';
 
 // Create Endpoint to get all products
 // @route GET /api/v1/products

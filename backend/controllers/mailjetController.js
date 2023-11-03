@@ -1,6 +1,6 @@
+import dotenv from 'dotenv';
 import Mailjet from 'node-mailjet';
 
-import dotenv from 'dotenv';
 dotenv.config();
 
 const mailjet = Mailjet.apiConnect(

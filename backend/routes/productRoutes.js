@@ -1,4 +1,5 @@
 import express from 'express';
+
 import { uploader } from '../middleware/uploadMiddleware.js';
 
 // import from Product Controller

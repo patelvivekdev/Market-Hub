@@ -1,9 +1,9 @@
 // firebaseConfig.js
-import { initializeApp } from 'firebase/app';
 import 'firebase/auth';
 import { getStorage } from 'firebase/storage';
-import dotenv from 'dotenv';
+import { initializeApp } from 'firebase/app';
 import admin from 'firebase-admin';
+import dotenv from 'dotenv';
 
 dotenv.config();
 

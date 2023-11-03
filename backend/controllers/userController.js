@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 
+import { uploadImage, deleteImage } from '../utils/firebase.js';
 import Admin from '../models/adminModel.js';
 import Client from '../models/clientModel.js';
 import generateToken from '../utils/generateToken.js';
@@ -10,8 +11,6 @@ import sendMail from './mailjetController.js';
 import TokenModel from '../models/tokenModel.js';
 import User from '../models/userModel.js';
 import Vendor from '../models/vendorModel.js';
-
-import { uploadImage, deleteImage } from '../utils/firebase.js';
 
 dotenv.config();
 
