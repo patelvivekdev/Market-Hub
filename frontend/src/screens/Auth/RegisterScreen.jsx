@@ -1,12 +1,12 @@
-import FormContainer from "../components/FormContainer";
-import Loader from "../components/Loader";
+import FormContainer from "../../components/FormContainer";
+import Loader from "../../components/Loader";
 import { useEffect, useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { setCredentials } from "../slices/authSlice";
-import { useCheckEmailMutation, useRegisterMutation } from "../slices/usersApiSlice";
+import { setCredentials } from "../../slices/authSlice";
+import { useCheckEmailMutation, useRegisterMutation } from "../../slices/usersApiSlice";
 
 const RegisterScreen = () => {
 	// access the params passed in the url

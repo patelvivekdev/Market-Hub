@@ -7,7 +7,11 @@ import {
 	getProducts,
 	getProductById,
 	createProduct,
+	updateProduct,
+	deleteProduct,
+	changeProductImage,
 	getProductsByVendor,
+	getProductsByCategory,
 } from '../controllers/productController.js';
 
 import {
@@ -26,13 +30,17 @@ router
 	.post(protect, vendor, uploader, createProduct);
 
 // Product route
-router.route('/:id').get(getProductById);
+router
+	.route('/:id')
+	.get(getProductById)
+	.put(protect, adminOrVendor, updateProduct)
+	.delete(protect, adminOrVendor, deleteProduct);
 
-// Edit product route
-// router.route('/:id/edit').put(protect, adminOrVendor, editProduct);
+// Change product image
+router.route('/:id/image').put(protect, vendor, uploader, changeProductImage);
 
-// Delete product route
-// router.route('/:id').delete(protect, adminOrVendor, deleteProduct);
+// get all products by category id
+router.route('/category/:id').get(getProductsByCategory);
 
 // get all products by vendor id
 router.route('/vendor/:id').get(getProductsByVendor);

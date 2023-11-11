@@ -19,8 +19,11 @@ dotenv.config();
 // Check user email for login
 const checkEmail = asyncHandler(async (req, res) => {
 	const { email } = req.body;
+
+	// find user by email
 	const user = await User.findOne({ email });
 
+	// if user exists
 	if (user) {
 		return res.status(200).json({
 			found: true,

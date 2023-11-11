@@ -23,7 +23,4 @@ router
 	.put(protect, admin, updateCategory)
 	.delete(protect, admin, deleteCategory);
 
-// Based on category id, get all products
-// router.route('/:id/products').get(getProductsByCategory);
-
 export default router;

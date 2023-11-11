@@ -1,9 +1,8 @@
-import Img from "../components/Image";
-import Loader from "../components/Loader";
+import Loader from "../../components/Loader";
 import { Button, Col, Image, Row, Table } from "react-bootstrap";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
-import { useGetProductsByVendorQuery } from "../slices/productsApiSlice";
+import { Link, useNavigate } from "react-router-dom";
+import { useGetProductsByVendorQuery } from "../../slices/productsApiSlice";
 
 const ProductsScreen = () => {
 
@@ -24,9 +23,8 @@ const ProductsScreen = () => {
 				</Col>
 				{userType === "Vendor" && (
 					<Col className='text-right'>
-						<Button className='my-3 btn btn-primary'>
-							<i className='fas fa-plus'></i> Create Product
-						</Button>
+						<Link to='/Vendor/products/add' className='btn btn-primary my-3'> Create Product
+						</Link>
 					</Col>
 				)}
 			</Row>
@@ -55,7 +53,7 @@ const ProductsScreen = () => {
 									<Button
 										variant='dark'
 										onClick={() =>
-											navigate(`/products/${product._id}`)
+											navigate(`/Vendor/products/${product._id}`)
 										}
 									>
 										{product._id}
@@ -72,14 +70,14 @@ const ProductsScreen = () => {
 								</td>
 								<td>{product.name}</td>
 								<td>${product.price}</td>
-								<td>{product.category}</td>
+								<td>{product.category.name}</td>
 								<td>{product.countInStock}</td>
 								<td>
 									<Button
 										variant='light'
 										className='btn'
 										onClick={() =>
-											navigate(`/products/${product._id}/edit`)
+											navigate(`/Vendor/products/${product._id}/edit`)
 										}
 									>
 										<FaEdit />

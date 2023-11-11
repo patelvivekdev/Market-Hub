@@ -81,7 +81,7 @@ const Header = () => {
                 <>
                   <LinkContainer to='/cart'>
                     <Nav.Link>
-                      <FaShoppingCart />
+                      <FaShoppingCart /> Cart
                       {cartItems.length > 0 && (
                         <Badge pill bg='primary' style={{ marginLeft: '5px' }}>
                           {cartItems.reduce((a, c) => a + c.qty, 0)}
@@ -100,9 +100,6 @@ const Header = () => {
                       <MdProductionQuantityLimits /> Products
                     </Nav.Link>
                   </LinkContainer>
-                  {/* <LinkContainer to='/vendor/orderlist'>
-                    <Nav.Link>Orders</Nav.Link>
-                  </LinkContainer> */}
                 </>
               )}
 
@@ -170,6 +167,12 @@ const Header = () => {
                   </LinkContainer>
                   <LinkContainer to='/Admin/userlist'>
                     <NavDropdown.Item>Users</NavDropdown.Item>
+                  </LinkContainer>
+                  <LinkContainer to='/Admin/orderlist'>
+                    <NavDropdown.Item>Orders</NavDropdown.Item>
+                  </LinkContainer>
+                  <LinkContainer to='/Admin/categories'>
+                    <NavDropdown.Item>Categories</NavDropdown.Item>
                   </LinkContainer>
                 </NavDropdown>
               )}

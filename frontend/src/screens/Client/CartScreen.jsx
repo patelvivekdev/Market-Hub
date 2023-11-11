@@ -1,8 +1,8 @@
-import Message from "../components/Message";
+import Message from "../../components/Message";
 import { FaTrash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { addToCart, removeFromCart } from "../slices/cartSlice";
+import { addToCart, removeFromCart } from "../../slices/cartSlice";
 
 import {
   Row,

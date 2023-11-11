@@ -1,12 +1,13 @@
-import FormContainer from "../components/FormContainer";
-import Loader from "../components/Loader";
+import FormContainer from "../../components/FormContainer";
+import Loader from "../../components/Loader";
 import { useEffect, useState } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { setCredentials } from "../slices/authSlice";
-import { useLoginMutation } from "../slices/usersApiSlice";
+import { setCredentials } from "../../slices/authSlice";
+import { useLoginMutation } from "../../slices/usersApiSlice";
+import { resetCart } from "../../slices/cartSlice";
 
 const LoginScreen = () => {
 	const [email, setEmail] = useState('');
@@ -75,9 +76,11 @@ const LoginScreen = () => {
 
 			switch (res.userType) {
 				case 'Admin':
+					dispatch(resetCart());
 					navigate('/');
 					break;
 				case 'Vendor':
+					dispatch(resetCart());
 					navigate('/Vendor/products');
 					break;
 				default:

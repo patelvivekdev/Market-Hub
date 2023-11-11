@@ -126,26 +126,10 @@ const deleteCategory = asyncHandler(async (req, res) => {
 	}
 });
 
-// Based on category id, get all products
-// @route GET /api/v1/categories/:id/products
-
-const getProductsByCategory = asyncHandler(async (req, res) => {
-	const category = await Category.findById(req.params.id);
-	if (category) {
-		const products = await Product.find({ category: req.params.id });
-		res.json(products);
-	} else {
-		return res.status(404).json({
-			message: 'Category not found',
-		});
-	}
-});
-
 export {
 	getCategories,
 	getCategoryById,
 	createCategory,
 	updateCategory,
 	deleteCategory,
-	getProductsByCategory,
 };

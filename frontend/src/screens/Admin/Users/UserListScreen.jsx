@@ -1,12 +1,12 @@
-import Loader from "../../components/Loader";
-import Message from "../../components/Message";
+import Loader from "../../../components/Loader";
+import Message from "../../../components/Message";
 import React from "react";
 import { Button, Table } from "react-bootstrap";
 import { FaCheck, FaEdit, FaTimes, FaTrash } from "react-icons/fa";
 
 import {
   useGetUsersQuery,
-} from '../../slices/usersApiSlice';
+} from '../../../slices/usersApiSlice';
 
 const UserListScreen = () => {
   const { data: users, isLoading, error } = useGetUsersQuery();

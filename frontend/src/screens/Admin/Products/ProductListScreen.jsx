@@ -1,11 +1,11 @@
-import Loader from "../../components/Loader";
-import Message from "../../components/Message";
+import Loader from "../../../components/Loader";
+import Message from "../../../components/Message";
 import { Button, Col, Row, Table } from "react-bootstrap";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
 import {
   useGetProductsQuery,
-} from '../../slices/productsApiSlice';
+} from '../../../slices/productsApiSlice';
 
 const ProductListScreen = () => {
 
