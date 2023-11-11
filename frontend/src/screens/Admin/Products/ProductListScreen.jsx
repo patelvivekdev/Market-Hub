@@ -41,7 +41,7 @@ const ProductListScreen = () => {
                   <td>{product._id}</td>
                   <td>{product.name}</td>
                   <td>${product.price}</td>
-                  <td>{product.category}</td>
+                  <td>{product?.category?.name}</td>
                   <td>{product.vendor.vendorName}</td>
                   <td>
                     <Button variant='light' className='btn-sm mx-2'>

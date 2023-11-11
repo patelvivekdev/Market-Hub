@@ -1,6 +1,6 @@
 {
 	"name": "market-place",
-	"version": "1.0.0",
+	"version": "3.0.3",
 	"type": "module",
 	"description": "Market Place is a web application that allows users to buy and sell products at single place.",
 	"main": "index.js",
