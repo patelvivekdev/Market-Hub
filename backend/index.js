@@ -41,7 +41,7 @@ app.use('/api/v1/categories', categoryRoutes);
 
 app.post('reset-password', forgotPassword);
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'PRODUCTION') {
 	const __dirname = path.resolve();
 	app.use(express.static(path.join(__dirname, '/frontend/build')));
 

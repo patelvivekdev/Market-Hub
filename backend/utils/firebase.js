@@ -27,12 +27,11 @@ const uploadImage = async (file) => {
 
 const deleteImage = async (imageName) => {
 	try {
+		if (imageName === 'default.jpg') return;
 		const imageRef = ref(storage, imageName);
 		await deleteObject(imageRef);
-		console.log('Image deleted successfully');
 	} catch (error) {
 		console.error('Error deleting image:', error.message);
-		throw error;
 	}
 };
 
