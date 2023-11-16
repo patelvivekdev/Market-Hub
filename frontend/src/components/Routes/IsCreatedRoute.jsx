@@ -10,6 +10,10 @@ const IsCreatedRoute = () => {
 	const { data: product, isLoading, isError } = useGetProductDetailsQuery(id);
 	const { userInfo } = useSelector((state) => state.auth);
 
+	if (!userInfo) {
+		return <Navigate to='/' replace />;
+	}
+
 	if (isLoading) {
 		return <Loader />;
 	} else if (isError) {

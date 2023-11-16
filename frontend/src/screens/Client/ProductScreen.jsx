@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Card, Col, Form, ListGroup, Row } from "react-bootstrap";
+import { Button, Card, Col, Form, ListGroup, Row, Modal } from "react-bootstrap";
 import { addToCart } from "../../slices/cartSlice";
-import { useGetProductDetailsQuery } from "../../slices/productsApiSlice";
+import { useGetProductDetailsQuery, useChangeProductImageMutation } from "../../slices/productsApiSlice";
+import { toast } from "react-toastify";
 import Loader from "../../components/Loader";
 import Message from "../../components/Message";
 import Img from "../../components/Img";
@@ -11,9 +12,12 @@ import Img from "../../components/Img";
 const ProductScreen = () => {
 	const { id } = useParams();
 	const [qty, setQty] = useState(1);
+	const [image, setImage] = useState('');
+	const [showModal, setShowModal] = useState(false);
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const { data: product, isLoading, isError } = useGetProductDetailsQuery(id);
+	const [changeImage, { isLoading: isUploading }] = useChangeProductImageMutation();
 	const userInfo = useSelector((state) => state.auth.userInfo);
 	const userType = userInfo?.userType;
 
@@ -30,8 +34,55 @@ const ProductScreen = () => {
 		);
 	};
 
+	// Function to handle image change form submission
+	const handleImageChange = async (e) => {
+		e.preventDefault();
+
+		// check if image is selected
+		if (!image) {
+			return toast.error('Please select an image', {
+				toastId: 'changeImageToastId',
+				autoClose: 2000,
+			});
+		}
+
+		try {
+			const formData = new FormData();
+			formData.append('image', image);
+
+			// Make API call to change the image
+			await changeImage({ productId: product._id, formData: formData }).unwrap();
+			toast.success('Image changed successfully', {
+				toastId: 'changeImageToastId',
+				autoClose: 2000,
+			});
+		} catch (error) {
+			toast.error(
+				error?.response?.data?.message ||
+				error?.data?.message ||
+				'An error occurred. Please try again.'
+			);
+		}
+
+		setShowModal(false); // Close the modal after image change
+	};
+
+	// Function to render "Change Image" button and modal
+	const renderChangeImageButton = () => {
+		return isCreator && (
+			<>
+				<Button className='btn btn-primary my-3 ms-3' onClick={() => {
+					console.log('clicked')
+					setShowModal(true)
+				}}>
+					Change Image
+				</Button>
+			</>
+		);
+	};
+
 	const renderLoadingOrError = () => {
-		if (isLoading) {
+		if (isUploading || isLoading) {
 			return <Loader />;
 		} else if (isError) {
 			return <Message variant='danger'>{isError?.data?.message || isError.error}</Message>;
@@ -51,6 +102,36 @@ const ProductScreen = () => {
 					<Col md={3}>
 						<div>
 							<Img src={product.image} alt={product.name} />
+							{renderChangeImageButton()}
+
+							{/* Modal to handle image change */}
+							{showModal && (
+								<Modal show={showModal} onHide={() => setShowModal(false)}>
+									<Modal.Header closeButton>
+										<Modal.Title>Change Image</Modal.Title>
+									</Modal.Header>
+									<Modal.Body>
+										<Form>
+											<Form.Group controlId='roleSelect'>
+												<Form.Label>Select New Image</Form.Label>
+												<Form.Control
+													type='file'
+													accept='image/*'
+													onChange={(e) => setImage(e.target.files[0])}
+												></Form.Control>
+											</Form.Group>
+										</Form>
+									</Modal.Body>
+									<Modal.Footer>
+										<Button variant='secondary' onClick={() => setShowModal(false)}>
+											Close
+										</Button>
+										<Button variant='primary' onClick={handleImageChange}>
+											Register
+										</Button>
+									</Modal.Footer>
+								</Modal>
+							)}
 						</div>
 					</Col>
 					<Col md={3}>

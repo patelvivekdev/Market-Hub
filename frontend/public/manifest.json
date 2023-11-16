@@ -1,6 +1,6 @@
 {
-	"short_name": "React App",
-	"name": "Create React App Sample",
+	"short_name": "Market Hub",
+	"name": "Market Place is a web application that allows users to buy and sell products at single place.",
 	"start_url": ".",
 	"display": "standalone",
 	"theme_color": "#000000",

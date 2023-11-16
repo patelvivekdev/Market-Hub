@@ -20,6 +20,7 @@ export const productsApiSlice = apiSlice.injectEndpoints({
 			query: (vendorId) => ({
 				url: `${PRODUCTS_URL}/vendor/${vendorId}`,
 			}),
+			providesTags: ['Products'],
 			keepUnusedDataFor: 5,
 		}),
 		getProductsByCategory: builder.query({
@@ -48,7 +49,7 @@ export const productsApiSlice = apiSlice.injectEndpoints({
 			query: (data) => ({
 				url: `${PRODUCTS_URL}/${data.productId}/image`,
 				method: 'PUT',
-				body: data,
+				body: data.formData,
 			}),
 			invalidatesTags: ['Product'],
 		}),
@@ -57,7 +58,7 @@ export const productsApiSlice = apiSlice.injectEndpoints({
 				url: `${PRODUCTS_URL}/${productId}`,
 				method: 'DELETE',
 			}),
-			providesTags: ['Product'],
+			invalidatesTags: ['Products'],
 		}),
 		// getTopProducts: builder.query({
 		// 	query: () => `${PRODUCTS_URL}/top`,

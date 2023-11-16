@@ -61,6 +61,9 @@ const routes = createBrowserRouter(
 			{/* PRODUCT ROUTES */}
 			<Route path='/products/:id' element={<ProductScreen />} />
 
+			{/* CART ROUTES */}
+			<Route path='/cart' element={<CartScreen />} />
+
 			{/* PRIVATE ROUTE */}
 			<Route path='' element={<PrivateRoute />}>
 				<Route
@@ -71,10 +74,14 @@ const routes = createBrowserRouter(
 
 			{/* CLIENT ROUTES */}
 			<Route path='' element={<ClientRoute />}>
-				{/* CART ROUTES */}
-				<Route path='/cart' element={<CartScreen />} />
 				{/* SHIPPING ROUTES */}
 				<Route path='/shipping' element={<ShippingScreen />} />
+
+				{/* ORDER ROUTES */}
+				<Route path='/order/:id' element={<ShippingScreen />} />
+
+				{/* PAYMENT ROUTES */}
+				<Route path='/payment' element={<ShippingScreen />} />
 			</Route>
 
 			{/* VENDOR ROUTES */}

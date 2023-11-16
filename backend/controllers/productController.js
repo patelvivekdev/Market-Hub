@@ -192,7 +192,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 
 	// Delete product from the database
 	try {
-		await product.findByIdAndDelete(req.params.id);
+		await Product.findByIdAndDelete(req.params.id);
 
 		// Delete image from firebase storage
 		await deleteImage(product.image);
@@ -202,7 +202,9 @@ const deleteProduct = asyncHandler(async (req, res) => {
 			.json({ message: 'Product deleted successfully' });
 	} catch (error) {
 		// Handle error appropriately
-		return res.status(500).json({ message: 'Failed to delete product' });
+		return res
+			.status(500)
+			.json({ message: 'Failed to delete product.' + error });
 	}
 });
 
@@ -226,6 +228,10 @@ const changeProductImage = asyncHandler(async (req, res) => {
 	if (file) {
 		// Upload new image to firebase storage
 		image_url = await uploadImage(file);
+	} else {
+		return res.status(400).json({
+			message: 'Please select an image',
+		});
 	}
 
 	if (image_url) {

@@ -5,7 +5,7 @@ const ClientRoute = () => {
 	const { userInfo } = useSelector((state) => state.auth);
 
 	if (!userInfo) {
-		return <Outlet />;
+		return <Navigate to='/' replace />;
 	}
 
 	const isClient = userInfo && userInfo.userType === 'Client';
