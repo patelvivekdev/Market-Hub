@@ -1,3 +1,5 @@
+// Imports
+
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import express from 'express';
@@ -8,8 +10,6 @@ import { forgotPassword } from './controllers/userController.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';
-
-// Imports
 
 // dotenv config
 dotenv.config();
@@ -50,11 +50,19 @@ if (process.env.NODE_ENV === 'PRODUCTION') {
 			path.resolve(__dirname, 'frontend', 'build', 'index.html')
 		)
 	);
-} else {
+} else if (process.env.NODE_ENV === 'DEVELOPMENT') {
 	const __dirname = path.resolve();
 	app.get('/', (req, res) => {
-		res.send('API is running....');
+		res.send('--> INFO: API is running....');
 	});
+} else {
+	const __dirname = path.resolve();
+	app.use(express.static(path.join(__dirname, '/frontend/build')));
+	app.get('*', (req, res) =>
+		res.sendFile(
+			path.resolve(__dirname, 'frontend', 'build', 'index.html')
+		)
+	);
 }
 
 // Listen
