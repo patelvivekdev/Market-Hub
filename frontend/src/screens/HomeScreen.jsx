@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import Loader from "../../components/Loader";
+import Loader from "../components/Loader";
 import { Button, Card, Col, Row, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { useGetProductsQuery } from "../../slices/productsApiSlice";
+import { useGetProductsQuery } from "../slices/productsApiSlice";
 
 const HomeScreen = () => {
 
@@ -21,7 +21,6 @@ const HomeScreen = () => {
 			return product.name.toLowerCase().includes(e.toLowerCase());
 		});
 		setP(filteredProducts);
-
 	};
 
 
@@ -77,7 +76,7 @@ const HomeScreen = () => {
 									<Card.Body className='d-flex flex-column'>
 										<Card.Title>{product.name}</Card.Title>
 										<Card.Text>{product.description}</Card.Text>
-										<Button variant='dark' className='mt-auto text-white'
+										<Button variant='primary' className='mt-auto my-2'
 											onClick={() => {
 												navigate(`/products/${product._id}`)
 											}

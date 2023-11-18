@@ -126,6 +126,21 @@ const LoginScreen = () => {
 			</Form>
 			<Row className='py-3'>
 				<Col>
+					Not remember Password?{' '}
+
+					<Button
+						variant='light'
+						className='btn btn-outline-primary ms-2'
+						onClick={() =>
+							redirect ? navigate(`/forget-password?redirect=${redirect}`) : navigate('/forget-password')
+						}
+					>
+						Forget Password
+					</Button>{' '}
+				</Col>
+			</Row>
+			<Row className='py-3'>
+				<Col>
 					New Customer?{' '}
 					<Button
 						variant='light'

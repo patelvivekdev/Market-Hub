@@ -7,12 +7,19 @@ import { uploadImage, deleteImage } from '../utils/firebase.js';
 import Admin from '../models/adminModel.js';
 import Client from '../models/clientModel.js';
 import generateToken from '../utils/generateToken.js';
-import sendMail from './mailjetController.js';
+import sendMail from './mailController.js';
 import TokenModel from '../models/tokenModel.js';
 import User from '../models/userModel.js';
 import Vendor from '../models/vendorModel.js';
 
 dotenv.config();
+
+const BASE_URL =
+	process.env.NODE_ENV === 'DEVELOPMENT'
+		? process.env.BASE_URL_DEV
+		: process.env.NODE_ENV === 'PRODUCTION'
+		? process.env.BASE_URL_PROD
+		: process.env.BASE_URL_TEST;
 
 // ------------------------------ EMAIL CHECK ------------------------
 
@@ -250,7 +257,7 @@ const registerUser = asyncHandler(async (req, res) => {
 			token: token,
 		});
 
-		const verifyUrl = `${process.env.BASE_URL}/verify-account/${token}`;
+		const verifyUrl = `${BASE_URL}/verify-account/${token}`;
 
 		// send email
 		const message = `
@@ -265,7 +272,7 @@ const registerUser = asyncHandler(async (req, res) => {
 		`;
 		try {
 			await sendMail({
-				Recipients: [{ Email: user.email }],
+				To: user.email,
 				Subject: 'Registration Successful',
 				HTMLPart: message,
 			});
@@ -485,7 +492,7 @@ const validateAccount = asyncHandler(async (req, res) => {
 
 	try {
 		await sendMail({
-			Recipients: [{ Email: user.email }],
+			To: user.email,
 			Subject: 'Account Verified',
 			HTMLPart: message,
 		});
@@ -564,7 +571,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
 	}
 
 	// check email with regex
-	const emailRegex = /\S+@\S+\.\S+/;
+	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 	if (!emailRegex.test(email)) {
 		return res.status(400).json({
 			message: 'Please enter a valid email',
@@ -578,7 +585,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
 	if (!user) {
 		return res.status(400).json({
-			message: 'Please enter a valid email',
+			message: 'User with this email does not exist.',
 		});
 	}
 
@@ -588,31 +595,31 @@ const forgotPassword = asyncHandler(async (req, res) => {
 		token: token,
 	});
 
-	const resetUrl = `${process.env.BASE_URL}/reset-password/${token}`;
+	const resetUrl = `${BASE_URL}/reset-password/${token}`;
 	const message = `
 		<h1>You have requested a password reset</h1>
 		<p>Please go to this link to reset your password</p>
 		<a href=${resetUrl} clicktracking=off>${resetUrl}</a>
 
-		<p>If you did not request a password reset, please ignore this email.</p>
+		<p>If you did not request a password reset, please contact us immediately.</p>
 
 		<p>Regards,</p>
-		<p>Team</p>
+		<p>Market Hub Team</p>
 	`;
 	try {
 		await sendMail({
-			Recipients: [{ Email: email }],
+			To: email,
 			Subject: 'Password Reset Request',
 			HTMLPart: message,
 		});
 
-		res.status(200).json({
+		return res.status(200).json({
 			success: true,
-			data: 'Email sent',
+			message: 'Email sent successfully.',
 		});
 	} catch (error) {
 		console.log("--> Error: Can't send email", error);
-		resetPassword.remove();
+		await TokenModel.findOneAndDelete({ token: resetPassword });
 		return res.status(500).json({
 			message: 'Email could not be sent',
 		});
@@ -622,16 +629,17 @@ const forgotPassword = asyncHandler(async (req, res) => {
 // For reset password (change password)
 const resetPassword = asyncHandler(async (req, res) => {
 	const { resetToken } = req.params;
-	const { new_password, password_confirmation } = req.body;
+
+	const { newPassword, confirmPassword } = req.body;
 
 	// check for any empty field
-	if (!new_password || !password_confirmation) {
+	if (!newPassword || !confirmPassword) {
 		return res
 			.status(400)
 			.json({ message: 'Please fill all the fields' });
 	}
 
-	if (new_password !== password_confirmation) {
+	if (newPassword !== confirmPassword) {
 		return res.status(400).json({ message: 'Passwords do not match' });
 	}
 
@@ -649,7 +657,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 
 	// password encryption
 	const salt = await bcrypt.genSalt(10);
-	user.password = await bcrypt.hash(new_password, salt);
+	user.password = await bcrypt.hash(newPassword, salt);
 
 	await user.save();
 
@@ -666,7 +674,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 	`;
 	try {
 		await sendMail({
-			Recipients: [{ Email: user.email }],
+			To: user.email,
 			Subject: 'Password Reset Successful',
 			HTMLPart: message,
 		});

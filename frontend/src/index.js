@@ -7,13 +7,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import App from './App';
 
 // SCREENS
-import HomeScreen from './screens/Auth/HomeScreen';
+import HomeScreen from './screens/HomeScreen';
 import AboutUs from './screens/AboutScreen';
 
 // AUTH SCREENS
 import RegisterScreen from './screens/Auth/RegisterScreen';
 import LoginScreen from './screens/Auth/LoginScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import ForgetPasswordScreen from './screens/Auth/ForgetPasswordScreen';
+import ResetPasswordScreen from './screens/Auth/ResetPasswordScreen';
 
 // CLIENT SCREENS
 import CartScreen from './screens/Client/CartScreen';
@@ -64,6 +66,14 @@ const routes = createBrowserRouter(
 			{/* AUTH ROUTES */}
 			<Route path='/login' element={<LoginScreen />} />
 			<Route path='/:userType/register' element={<RegisterScreen />} />
+			<Route
+				path='/forget-password'
+				element={<ForgetPasswordScreen />}
+			/>
+			<Route
+				path='/reset-password/:resetToken'
+				element={<ResetPasswordScreen />}
+			/>
 
 			{/* PRODUCT ROUTES */}
 			<Route path='/products/:id' element={<ProductScreen />} />

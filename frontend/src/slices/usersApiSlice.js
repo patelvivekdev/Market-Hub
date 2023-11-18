@@ -70,6 +70,34 @@ export const userApiSlice = apiSlice.injectEndpoints({
 			}),
 			invalidatesTags: ['User'],
 		}),
+		forgetPassword: builder.mutation({
+			query: (email) => ({
+				url: `${USERS_URL}/forgot-password`,
+				method: 'POST',
+				body: email,
+			}),
+		}),
+		resetPassword: builder.mutation({
+			query: (data) => ({
+				url: `${USERS_URL}/reset-password/${data.resetToken}`,
+				method: 'POST',
+				body: data,
+			}),
+		}),
+		changePassword: builder.mutation({
+			query: (data) => ({
+				url: `${USERS_URL}/profile/password`,
+				method: 'PUT',
+				body: data,
+			}),
+		}),
+		uploadProfilePic: builder.mutation({
+			query: (data) => ({
+				url: `${USERS_URL}/profile/pic`,
+				method: 'PUT',
+				body: data,
+			}),
+		}),
 	}),
 });
 
@@ -84,4 +112,7 @@ export const {
 	useUpdateUserMutation,
 	useGetUserDetailsQuery,
 	useVerifyMutation,
+	useForgetPasswordMutation,
+	useResetPasswordMutation,
+	useChangePasswordMutation,
 } = userApiSlice;
