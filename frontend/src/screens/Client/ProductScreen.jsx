@@ -16,7 +16,7 @@ const ProductScreen = () => {
 	const [showModal, setShowModal] = useState(false);
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
-	const { data: product, isLoading, isError } = useGetProductDetailsQuery(id);
+	const { data: product, refetch, isLoading, isError } = useGetProductDetailsQuery(id);
 	const [changeImage, { isLoading: isUploading }] = useChangeProductImageMutation();
 	const userInfo = useSelector((state) => state.auth.userInfo);
 	const userType = userInfo?.userType;
@@ -36,6 +36,7 @@ const ProductScreen = () => {
 
 	// Function to handle image change form submission
 	const handleImageChange = async (e) => {
+		setShowModal(false);
 		e.preventDefault();
 
 		// check if image is selected
@@ -56,6 +57,7 @@ const ProductScreen = () => {
 				toastId: 'changeImageToastId',
 				autoClose: 2000,
 			});
+			refetch();
 		} catch (error) {
 			toast.error(
 				error?.response?.data?.message ||
@@ -63,8 +65,6 @@ const ProductScreen = () => {
 				'An error occurred. Please try again.'
 			);
 		}
-
-		setShowModal(false); // Close the modal after image change
 	};
 
 	// Function to render "Change Image" button and modal
@@ -127,7 +127,7 @@ const ProductScreen = () => {
 											Close
 										</Button>
 										<Button variant='primary' onClick={handleImageChange}>
-											Register
+											Upload
 										</Button>
 									</Modal.Footer>
 								</Modal>

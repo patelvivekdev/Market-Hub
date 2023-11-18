@@ -8,7 +8,7 @@ const ClientRoute = () => {
 		return <Navigate to='/' replace />;
 	}
 
-	const isClient = userInfo && userInfo.userType === 'Client';
+	const isClient = userInfo.userType === 'Client' || userInfo.userType === 'Admin';
 
 	return isClient ? <Outlet /> : <Navigate to='/login' replace />;
 };

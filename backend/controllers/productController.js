@@ -78,7 +78,7 @@ const createProduct = asyncHandler(async (req, res) => {
 	} else {
 		// Set default image
 		product.image =
-			'https://firebasestorage.googleapis.com/v0/b/market-hub-1937e.appspot.com/o/default.jpg?alt=media&token=4222dffe-31c0-47de-9c1d-37b2e290dd7c';
+			'https://firebasestorage.googleapis.com/v0/b/market-hub-1937e.appspot.com/o/default.jpg?alt=media&token=9ddd7635-4413-4594-b8d4-530aec97b7ac';
 	}
 
 	// Save product to the database

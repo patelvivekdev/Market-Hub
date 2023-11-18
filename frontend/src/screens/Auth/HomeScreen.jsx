@@ -59,7 +59,11 @@ const HomeScreen = () => {
 
 						{isVendor && (
 							<Col className='text-right'>
-								<Button className='my-3'>
+								<Button className='my-3' onClick={
+									() => {
+										navigate('/Vendor/products/add')
+									}
+								}>
 									<i className='fas fa-plus'></i> Create Product
 								</Button>
 							</Col>

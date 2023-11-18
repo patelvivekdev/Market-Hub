@@ -13,7 +13,7 @@ const ProductEditScreen = () => {
 	const navigate = useNavigate();
 
 	const { data: categories, isLoading: categoryLoading, isError: categoryError } = useGetCategoriesQuery();
-	const { data: product, isLoading: productLoading, isError: productError } = useGetProductDetailsQuery(id);
+	const { data: product, refetch, isLoading: productLoading, isError: productError } = useGetProductDetailsQuery(id);
 	const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
 
 	const [name, setName] = useState('');
@@ -62,7 +62,8 @@ const ProductEditScreen = () => {
 			).unwrap();
 
 			toast.success('Product updated successfully');
-			navigate(`/Vendor/products/${product._id}`);
+			refetch();
+			navigate('/Vendor/products');
 		} catch (error) {
 			toast.error(
 				error?.response?.data?.message ||
@@ -77,7 +78,7 @@ const ProductEditScreen = () => {
 
 	return (
 		<>
-			<Link to='/admin/productlist' className='btn btn-light my-3'>
+			<Link to='/Vendor/products' className='btn btn-light my-3'>
 				Go Back
 			</Link>
 			<h1>Edit Product</h1>

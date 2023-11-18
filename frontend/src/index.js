@@ -1,8 +1,10 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import App from './App';
+import { Provider } from 'react-redux';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Provider } from 'react-redux';
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+import App from './App';
 
 // SCREENS
 import HomeScreen from './screens/Auth/HomeScreen';
@@ -17,6 +19,9 @@ import ProfileScreen from './screens/ProfileScreen';
 import CartScreen from './screens/Client/CartScreen';
 import ShippingScreen from './screens/Client/ShippingScreen';
 import ProductScreen from './screens/Client/ProductScreen';
+import PaymentScreen from './screens/Client/PaymentScreen';
+import PlaceOrderScreen from './screens/Client/PlaceOrderScreen';
+import OrderScreen from './screens/Client/OrderScreen';
 
 // VENDOR SCREENS
 import ProductsScreen from './screens/Vendor/ProductsScreen';
@@ -26,6 +31,7 @@ import EditProductScreen from './screens/Vendor/EditProductScreen';
 // ADMIN SCREENS
 import UserListScreen from './screens/Admin/Users/UserListScreen';
 import ProductListScreen from './screens/Admin/Products/ProductListScreen';
+import OrderListScreen from './screens/Admin/Orders/OrderListScreen';
 
 import CategoryListScreen from './screens/Admin/Categories/CategoryListScreen';
 import AddCategoryScreen from './screens/Admin/Categories/AddCategoryScreen';
@@ -37,6 +43,7 @@ import PrivateRoute from './components/Routes/PrivateRoute';
 import ClientRoute from './components/Routes/ClientRoute';
 import VendorRoute from './components/Routes/VendorRoute';
 import IsCreatedRoute from './components/Routes/IsCreatedRoute';
+import IsOrderedRoute from './components/Routes/IsOrderedRoute';
 
 import store from './store';
 
@@ -77,11 +84,16 @@ const routes = createBrowserRouter(
 				{/* SHIPPING ROUTES */}
 				<Route path='/shipping' element={<ShippingScreen />} />
 
-				{/* ORDER ROUTES */}
-				<Route path='/order/:id' element={<ShippingScreen />} />
-
 				{/* PAYMENT ROUTES */}
-				<Route path='/payment' element={<ShippingScreen />} />
+				<Route path='/payment' element={<PaymentScreen />} />
+
+				{/* PLACE ORDER ROUTES */}
+				<Route path='/placeorder' element={<PlaceOrderScreen />} />
+
+				{/* ORDER ROUTES */}
+				<Route path='' element={<IsOrderedRoute />}>
+					<Route path='/orders/:id' element={<OrderScreen />} />
+				</Route>
 			</Route>
 
 			{/* VENDOR ROUTES */}
@@ -120,7 +132,7 @@ const routes = createBrowserRouter(
 				/>
 				<Route
 					path='/Admin/orderlist'
-					element={<UserListScreen />}
+					element={<OrderListScreen />}
 				/>
 				<Route
 					path='/Admin/categories'

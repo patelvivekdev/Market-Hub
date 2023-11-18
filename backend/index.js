@@ -8,6 +8,7 @@ import path from 'path';
 
 import { forgotPassword } from './controllers/userController.js';
 import categoryRoutes from './routes/categoryRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 
@@ -22,7 +23,7 @@ try {
 	const conn = await mongoose.connect(process.env.MONGO_URI);
 	console.log(`--> INFO: MongoDB Connected: ${conn.connection.host}`);
 } catch (error) {
-	console.error(`--> Error: ${error.message}`);
+	console.error(`--> Error: ${error}`);
 	process.exit(1);
 }
 
@@ -38,6 +39,7 @@ app.use(cookieParser());
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/products', productRoutes);
 app.use('/api/v1/categories', categoryRoutes);
+app.use('/api/v1/orders', orderRoutes);
 
 app.post('reset-password', forgotPassword);
 

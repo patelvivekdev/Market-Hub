@@ -128,6 +128,7 @@ const AddProductScreen = () => {
 									type='number'
 									placeholder='Enter price'
 									min={1.0}
+									step={0.1}
 									value={price}
 									onChange={(e) => setPrice(e.target.value)}
 								></Form.Control>
@@ -139,6 +140,7 @@ const AddProductScreen = () => {
 									type='number'
 									placeholder='Enter count in stock'
 									min={1}
+									step={1}
 									maxLength={3}
 									value={countInStock}
 									onChange={(e) => setCountInStock(e.target.value)}
