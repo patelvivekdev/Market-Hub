@@ -12,7 +12,12 @@ const sendMail = async (mail) => {
 			from: process.env.SENDGRID_EMAIL,
 			subject: mail.Subject,
 			text: mail.TextPart,
-			html: mail.HTMLPart,
+			content: [
+				{
+					type: 'text/html',
+					value: mail.HTMLPart,
+				},
+			],
 		};
 		await sgMail.send(msg);
 	} catch (error) {

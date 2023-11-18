@@ -16,6 +16,8 @@ import LoginScreen from './screens/Auth/LoginScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import ForgetPasswordScreen from './screens/Auth/ForgetPasswordScreen';
 import ResetPasswordScreen from './screens/Auth/ResetPasswordScreen';
+import UpdateProfileScreen from './screens/Auth/UpdateProfileScreen';
+import ChangePasswordScreen from './screens/Auth/ChangePasswordScreen';
 
 // CLIENT SCREENS
 import CartScreen from './screens/Client/CartScreen';
@@ -86,6 +88,14 @@ const routes = createBrowserRouter(
 				<Route
 					path='/:userType/profile'
 					element={<ProfileScreen />}
+				/>
+				<Route
+					path='/:userType/profile/update'
+					element={<UpdateProfileScreen />}
+				/>
+				<Route
+					path='/:userType/profile/update-password'
+					element={<ChangePasswordScreen />}
 				/>
 			</Route>
 

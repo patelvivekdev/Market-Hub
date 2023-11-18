@@ -337,13 +337,24 @@ const getUserProfile = asyncHandler(async (req, res) => {
 
 // Update user details
 async function updateUserDetails(user, requestData) {
+	// check the user details and update
+
+	// check for duplicate email or username
+	const userExists = await User.findOne({
+		$or: [
+			{ email: requestData.email },
+			{ username: requestData.username },
+		],
+	});
+
+	if (userExists) {
+		return res.status(400).json({
+			message: 'User with this username or email already exists.',
+		});
+	}
+
 	user.username = requestData.username || user.username;
 	user.email = requestData.email || user.email;
-	if (requestData.password) {
-		// Password encryption
-		const salt = await bcrypt.genSalt(10);
-		user.password = await bcrypt.hash(requestData.password, salt);
-	}
 
 	return await user.save();
 }
@@ -532,31 +543,53 @@ const deactivateUser = asyncHandler(async (req, res) => {
 
 // changing password
 const updatePassword = asyncHandler(async (req, res) => {
-	const { current_password, new_password, password_confirmation } = req.body;
-	const user = req.user;
+	const { currentPassword, newPassword, confirmPassword } = req.body;
+
+	const user = await User.findById(req.user._id);
+
+	// check the user
+	if (!user) {
+		return res.status(401).json({
+			message: 'User not found',
+		});
+	}
 
 	// check for any empty field
-	if (!current_password || !new_password || !password_confirmation) {
+	if (!currentPassword || !newPassword || !confirmPassword) {
 		return res
 			.status(400)
 			.json({ message: 'Please fill all the fields' });
 	}
 
-	// check for the password match
-	if (!user.matchPassword(current_password)) {
+	if (!user.matchPassword(currentPassword)) {
 		return res.status(400).json({ message: 'Invalid password' });
 	}
 
-	if (new_password !== password_confirmation) {
+	// Check password with regex
+	const passwordRegex =
+		/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm;
+	if (!passwordRegex.test(newPassword)) {
+		return res.status(400).json({
+			message: 'Please enter a valid password',
+		});
+	}
+
+	// check for the password match
+	if (newPassword !== confirmPassword) {
 		return res.status(400).json({ message: 'Passwords do not match' });
 	}
 
 	// password encryption
 	const salt = await bcrypt.genSalt(10);
-	user.password = await bcrypt.hash(data.new_password, salt);
-
-	await user.save();
-	return res.json({ message: 'Password changed!' });
+	user.password = await bcrypt.hash(newPassword, salt);
+	try {
+		await user.save();
+		return res.json({ message: 'Password changed!' });
+	} catch (error) {
+		return res
+			.status(400)
+			.json({ message: 'Something went wrong! Please try again.' });
+	}
 });
 
 // For forgot password (send email)
@@ -597,14 +630,22 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
 	const resetUrl = `${BASE_URL}/reset-password/${token}`;
 	const message = `
-		<h1>You have requested a password reset</h1>
-		<p>Please go to this link to reset your password</p>
-		<a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+		<html>
+			<head>
+				<title>Password Reset Request</title>
+			</head>
+			<body>
+				<h1>You have requested a password reset</h1>
+				<p>Please go to this link to reset your password</p>
+					<button style="background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; display: inline-block; font-size: 16px;">
+						<a href="${resetUrl}" target="_blank">${resetUrl}</a>
+					</button>
+				<p>If you did not request a password reset, please contact us immediately.</p>
 
-		<p>If you did not request a password reset, please contact us immediately.</p>
-
-		<p>Regards,</p>
-		<p>Market Hub Team</p>
+				<p>Regards,</p>
+				<p>Market Hub Team</p>
+			</body>
+		</html>
 	`;
 	try {
 		await sendMail({

@@ -72,7 +72,6 @@ const ProductScreen = () => {
 		return isCreator && (
 			<>
 				<Button className='btn btn-primary my-3 ms-3' onClick={() => {
-					console.log('clicked')
 					setShowModal(true)
 				}}>
 					Change Image

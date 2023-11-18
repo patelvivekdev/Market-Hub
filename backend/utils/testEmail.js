@@ -5,17 +5,34 @@ dotenv.config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const msg = {
-	to: 'webdev0000010+1@gmail.com', // Change to your recipient
-	from: 'webdev0111+admin@proton.me', // Change to your verified sender
-	subject: 'Sending with SendGrid is Fun',
-	text: 'and easy to do anywhere, even with Node.js',
-	html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+const message = {
+	to: [
+		{
+			email: 'webdev0000010@gmail.com',
+			name: 'Web Dev',
+		},
+	],
+	from: {
+		email: process.env.SENDGRID_EMAIL,
+		name: process.env.SENDGRID_NAME,
+	},
+	subject: 'Your Example Order Confirmation',
+	content: [
+		{
+			type: 'text/html',
+			value: `
+				<p>Hello from Twilio SendGrid!</p>
+				<p>Sending with the email service trusted by developers and marketers for <strong>time-savings</strong>, <strong>scalability</strong>, and <strong>delivery expertise</strong>.</p>
+				<button>
+					<a href="http://localhost:5000/reset-password/2f2835df0e3d4c1fadbb70accdb6438f84ab80a8d537835081efd642d33be9ff">Reset Password</a>
+				</button>
+			`,
+		},
+	],
 };
 const sendEmail = async () => {
 	try {
-		await sgMail.send(msg);
-		console.log('Email sent successfully');
+		await sgMail.send(message);
 	} catch (error) {
 		throw new Error(error);
 	}

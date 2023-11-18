@@ -21,9 +21,7 @@ const ResetPasswordForm = () => {
 			toastId: toastId,
 			autoClose: 2000,
 		});
-
 	};
-
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -69,6 +67,7 @@ const ResetPasswordForm = () => {
 					<Form.Control
 						type="password"
 						value={password}
+						disabled={isLoading}
 						onChange={(e) => setPassword(e.target.value)}
 						required
 					/>
@@ -78,6 +77,7 @@ const ResetPasswordForm = () => {
 					<Form.Control
 						type="password"
 						value={confirmPassword}
+						disabled={isLoading}
 						onChange={(e) => setConfirmPassword(e.target.value)}
 						required
 					/>

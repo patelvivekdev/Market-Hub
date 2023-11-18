@@ -27,7 +27,6 @@ const uploadImage = async (file) => {
 
 const deleteImage = async (imageName) => {
 	try {
-		console.log('imageName', imageName);
 		if (
 			imageName ===
 			'https://firebasestorage.googleapis.com/v0/b/market-hub-1937e.appspot.com/o/default.jpg?alt=media&token=9ddd7635-4413-4594-b8d4-530aec97b7ac'
