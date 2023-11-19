@@ -34,7 +34,7 @@ const ForgetPasswordForm = () => {
 			navigate('/');
 		} catch (error) {
 			showErrorToast(
-				error?.data?.message || error?.response?.data?.message || 'Something went wrong while login! Please try again later.',
+				error?.data?.message || error?.response?.data?.message || 'Something went wrong! Please try again later.',
 				'loginToastId'
 			);
 		}
