@@ -27,14 +27,14 @@ const ProductsScreen = () => {
 			setShowDeleteModal(false);
 			toast.success('Product deleted successfully', {
 				toastId: 'deleteProductToastId',
-				autoClose: 2000,
+				autoClose: 1000,
 			});
 		} catch (error) {
 			toast.error(error?.response?.data?.message ||
 				error?.data?.message ||
 				'An error occurred. Please try again.', {
 				toastId: 'deleteProductToastId',
-				autoClose: 2000,
+				autoClose: 1000,
 			});
 		}
 	}

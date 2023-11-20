@@ -37,7 +37,7 @@ const PlaceOrderScreen = () => {
 
 			toast.success('Order placed successfully', {
 				toastId: 'placeOrderToast',
-				autoClose: 2000,
+				autoClose: 1000,
 			});
 
 			dispatch(clearCartItems());

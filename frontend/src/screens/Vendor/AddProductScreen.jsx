@@ -25,7 +25,7 @@ const AddProductScreen = () => {
 	const showErrorToast = (message) => {
 		toast.error(message, {
 			toastId: "addProductToast",
-			autoClose: 2000,
+			autoClose: 1000,
 		});
 	}
 
@@ -59,7 +59,7 @@ const AddProductScreen = () => {
 			await createProduct(formData).unwrap();
 			toast.success('Product added successfully', {
 				toastId: "addProductToast",
-				autoClose: 2000,
+				autoClose: 1000,
 			});
 			navigate(`/Vendor/products`);
 		} catch (error) {

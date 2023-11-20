@@ -19,7 +19,7 @@ const ResetPasswordForm = () => {
 	const showErrorToast = (message, toastId) => {
 		return toast.error(message, {
 			toastId: toastId,
-			autoClose: 2000,
+			autoClose: 1000,
 		});
 	};
 
@@ -31,14 +31,14 @@ const ResetPasswordForm = () => {
 		if (!passwordRegex.test(password)) {
 			return toast.error('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter and one number!', {
 				toastId: 'resetPasswordToastId',
-				autoClose: 2000,
+				autoClose: 1000,
 			});
 		}
 
 		if (password !== confirmPassword) {
 			return toast.error('Passwords do not match!', {
 				toastId: 'resetPasswordToastId',
-				autoClose: 2000,
+				autoClose: 1000,
 			});
 		}
 
@@ -46,7 +46,7 @@ const ResetPasswordForm = () => {
 			await resetPassword({ resetToken, newPassword: password, confirmPassword: confirmPassword }).unwrap();
 			toast.success(`Password reset successfully.`, {
 				toastId: 'resetPasswordToastId',
-				autoClose: 2000,
+				autoClose: 1000,
 			});
 			navigate('/');
 		} catch (error) {

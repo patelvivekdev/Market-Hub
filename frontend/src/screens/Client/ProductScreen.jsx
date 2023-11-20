@@ -43,7 +43,7 @@ const ProductScreen = () => {
 		if (!image) {
 			return toast.error('Please select an image', {
 				toastId: 'changeImageToastId',
-				autoClose: 2000,
+				autoClose: 1000,
 			});
 		}
 
@@ -55,7 +55,7 @@ const ProductScreen = () => {
 			await changeImage({ productId: product._id, formData: formData }).unwrap();
 			toast.success('Image changed successfully', {
 				toastId: 'changeImageToastId',
-				autoClose: 2000,
+				autoClose: 1000,
 			});
 			refetch();
 		} catch (error) {

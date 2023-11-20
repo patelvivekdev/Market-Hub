@@ -19,7 +19,7 @@ const ChangePasswordScreen = () => {
 	const showErrorToast = (message, toastId) => {
 		return toast.error(message, {
 			toastId: toastId,
-			autoClose: 2000,
+			autoClose: 1000,
 		});
 	};
 
@@ -30,7 +30,7 @@ const ChangePasswordScreen = () => {
 		if (!currentPassword || !newPassword || !confirmPassword) {
 			return toast.error('Please fill all the fields!', {
 				toastId: 'changePasswordToastId',
-				autoClose: 2000,
+				autoClose: 1000,
 			});
 		}
 
@@ -39,7 +39,7 @@ const ChangePasswordScreen = () => {
 		if (!passwordRegex.test(newPassword)) {
 			return toast.error('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter and one number!', {
 				toastId: 'changePasswordToastId',
-				autoClose: 2000,
+				autoClose: 1000,
 			});
 		}
 
@@ -47,7 +47,7 @@ const ChangePasswordScreen = () => {
 		if (newPassword !== confirmPassword) {
 			return toast.error('Passwords do not match!', {
 				toastId: 'changePasswordToastId',
-				autoClose: 2000,
+				autoClose: 1000,
 			});
 		}
 
@@ -56,7 +56,7 @@ const ChangePasswordScreen = () => {
 			await changePassword({ currentPassword, newPassword, confirmPassword }).unwrap();
 			toast.success(`Password changed successfully.`, {
 				toastId: 'changePasswordToastId',
-				autoClose: 2000,
+				autoClose: 1000,
 			});
 			navigate('/');
 		} catch (error) {

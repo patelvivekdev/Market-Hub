@@ -41,7 +41,7 @@ const LoginScreen = () => {
 	const showErrorToast = (message, toastId) => {
 		toast.error(message, {
 			toastId: toastId,
-			autoClose: 2000,
+			autoClose: 1000,
 		});
 	};
 

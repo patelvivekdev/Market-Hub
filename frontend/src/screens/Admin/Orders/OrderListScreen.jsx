@@ -5,14 +5,35 @@ import Message from '../../../components/Message';
 import Loader from '../../../components/Loader';
 import { useGetOrdersQuery } from '../../../slices/orderSlice';
 import { formattedDateTime } from '../../../utils/utils';
+import { toast } from 'react-toastify';
+import {
+  useDeliverOrderMutation,
+} from '../../../slices/orderSlice';
 
 
 const OrderListScreen = () => {
-  const { data: orders, isLoading, error } = useGetOrdersQuery();
+  const { data: orders, refetch, isLoading, error } = useGetOrdersQuery();
+
+  const [deliverOrder, { isLoading: loadingDeliver }] = useDeliverOrderMutation();
+
+  const deliverOrderHandler = async (orderId) => {
+    try {
+      await deliverOrder(orderId).unwrap();
+      refetch();
+      toast.success(`Order: ${orderId} is marked as delivered`);
+    } catch (error) {
+      toast.error(
+        error?.response?.data?.message ||
+        error?.data?.message ||
+        'An error occurred. Please try again.'
+      );
+    }
+  }
 
   return (
     <>
       <h1>Orders</h1>
+      {loadingDeliver && <Loader />}
       {isLoading ? (
         <Loader />
       ) : error ? (
@@ -62,7 +83,7 @@ const OrderListScreen = () => {
                   </LinkContainer>
                 </td>
                 <td>
-                  <Button variant='success' className='btn-sm btn'>
+                  <Button variant='success' className='btn-sm btn' onClick={() => deliverOrderHandler(order._id)}>
                     Mark as Delivered
                   </Button>
                 </td>

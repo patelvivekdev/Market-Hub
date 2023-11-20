@@ -17,7 +17,7 @@ const AddCategoryScreen = () => {
 	const showErrorToast = (message) => {
 		toast.error(message, {
 			toastId: "categoryErrorToast",
-			autoClose: 2000,
+			autoClose: 1000,
 		});
 	}
 

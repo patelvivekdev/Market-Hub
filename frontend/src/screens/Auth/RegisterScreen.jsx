@@ -73,7 +73,7 @@ const RegisterScreen = () => {
 	const showErrorToast = (message) => {
 		toast.error(message, {
 			toastId: customId,
-			autoClose: 2000,
+			autoClose: 1000,
 		});
 	}
 

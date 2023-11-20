@@ -90,7 +90,23 @@ const markOrderToPaid = asyncHandler(async (req, res) => {
 // @route   GET /api/orders/:id/deliver
 // @access  Private/Admin
 const markOrderToDelivered = asyncHandler(async (req, res) => {
-	res.send('update order to delivered');
+	const order = await Order.findById(req.params.id);
+
+	if (!order) {
+		return res.status(404).json({ message: 'Order not found' });
+	}
+
+	// check if order is paid
+	if (!order.isPaid) {
+		return res.status(400).json({ message: 'Order is not paid' });
+	}
+
+	order.isDelivered = true;
+	order.deliveredAt = Date.now();
+
+	const updatedOrder = await order.save();
+
+	return res.json(updatedOrder);
 });
 
 // @desc    Get logged in user orders
