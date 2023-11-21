@@ -18,6 +18,7 @@ import ForgetPasswordScreen from './screens/Auth/ForgetPasswordScreen';
 import ResetPasswordScreen from './screens/Auth/ResetPasswordScreen';
 import UpdateProfileScreen from './screens/Auth/UpdateProfileScreen';
 import ChangePasswordScreen from './screens/Auth/ChangePasswordScreen';
+import VerifyAccount from './components/VerifyAccount';
 
 // CLIENT SCREENS
 import CartScreen from './screens/Client/CartScreen';
@@ -75,6 +76,10 @@ const routes = createBrowserRouter(
 			<Route
 				path='/reset-password/:resetToken'
 				element={<ResetPasswordScreen />}
+			/>
+			<Route
+				path='/verify-account/:verifyToken'
+				element={<VerifyAccount />}
 			/>
 
 			{/* PRODUCT ROUTES */}

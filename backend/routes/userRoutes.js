@@ -32,7 +32,7 @@ router.route('/check').post(checkEmail);
 router.route('/').post(registerUser).get(protect, admin, getUsers);
 
 // Verify route
-router.route('/verify/:verifyToken').get(validateAccount);
+router.route('/verify/:verifyToken').post(validateAccount);
 
 // Auth route
 router.post('/auth', authUser);

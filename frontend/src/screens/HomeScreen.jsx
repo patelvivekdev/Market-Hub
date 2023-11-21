@@ -12,9 +12,6 @@ const HomeScreen = () => {
 	const { data: products, isLoading, isError } = useGetProductsQuery();
 	const { data: categories, isLoading: isCategoriesLoading, isError: categoryError } = useGetCategoriesQuery();
 
-	const { userType } = JSON.parse(localStorage.getItem('userInfo')) || {};
-	const isVendor = userType === 'Vendor';
-
 	const [filteredCategory, setFilteredCategory] = useState('');
 	const [searchValue, setSearchValue] = useState('');
 	const [filteredProducts, setFilteredProducts] = useState([]);
@@ -49,21 +46,20 @@ const HomeScreen = () => {
 
 	return (
 		<>
-			<Row>
-				<h1 className="text-center">Latest Products</h1>
+			<Row className='text-center'>
+				<h1>Latest Products</h1>
+				<hr />
 				<Col md={3}>
 					<h3>Filter</h3>
-					<Form.Group controlId='category'>
-						<Form.Label>Category</Form.Label>
+					<Form.Group>
 						<Form.Control
 							as='select'
-							custom
 							value={filteredCategory}
 							onChange={onCategoryChange}
 						>
-							<option value='All'>All</option>
+							<option key='All' value='All'>Select Category</option>
 							{categories.map((category) => (
-								<option key={category.id} value={category.name}>
+								<option key={category.name} value={category.name}>
 									{category.name}
 								</option>
 							))}
@@ -72,6 +68,7 @@ const HomeScreen = () => {
 				</Col>
 				<Col md={9}>
 					<Row className='text-center'>
+						<h3>Search Product</h3>
 						<Col className='d-flex justify-content-center'>
 							<Form.Control
 								type='text'
@@ -80,15 +77,17 @@ const HomeScreen = () => {
 								onChange={onSearch}
 							/>
 						</Col>
-						{isVendor && (
-							<Col className='text-right'>
-								<Button className='my-3' onClick={() => navigate('/Vendor/products/add')}>
-									<i className='fas fa-plus'></i> Create Product
-								</Button>
-							</Col>
-						)}
 					</Row>
 					<Row>
+
+						{/* If no product  show no products message*/}
+						{filteredProducts.length === 0 && (
+							<Col className='mt-4'>
+								<Message variant='info'>No Products Found</Message>
+							</Col>
+						)}
+
+						{/* If products are available show them */}
 						{filteredProducts.map((product) => (
 							<Col className='mt-4' key={product._id} sm={12} md={6} lg={4}>
 								<Card className='mb-3 h-100 d-flex'>

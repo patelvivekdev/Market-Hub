@@ -36,13 +36,9 @@ const UserListScreen = () => {
             {users.map((user) => (
               <tr key={user._id}>
                 <td>{user._id}</td>
-                {user.userType === 'Client' ? (
-                  <td>{user?.profile?.clientName}</td>
-                ) : user.userType === 'Vendor' ? (
-                  <td>{user?.profile?.vendorName}</td>
-                ) : user.userType === 'Admin' ? (
-                  <td>{user?.profile?.adminName}</td>
-                ) : null}
+                <td>
+                  {user.profile.name}
+                </td>
                 <td>
                   <a href={`mailto:${user.email}`}>{user.email}</a>
                 </td>

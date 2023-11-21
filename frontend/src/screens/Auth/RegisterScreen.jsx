@@ -154,6 +154,9 @@ const RegisterScreen = () => {
 
 	return (
 		<FormContainer>
+
+			{isEmailValidLoading && <Loader />}
+			{isLoading && <Loader />}
 			<h1>Register New {userType}</h1>
 			<Form onSubmit={submitHandler}>
 				<Form.Group className='my-2' controlId='username'>
@@ -210,7 +213,7 @@ const RegisterScreen = () => {
 				{
 					/* 
 						userType: Client
-						Client details: clientName, phone, address
+						Client details: clientName, phone
 					 */
 				}
 				{userType === 'Client' && (
@@ -219,20 +222,10 @@ const RegisterScreen = () => {
 							<Form.Label>{userType}Name</Form.Label>
 							<Form.Control
 								type='name'
-								placeholder='Enter name'
+								placeholder='Enter Full Name'
 								disabled={isLoading}
 								value={name}
 								onChange={(e) => setName(e.target.value)}
-							></Form.Control>
-						</Form.Group>
-						<Form.Group className='my-2' controlId='address'>
-							<Form.Label>Address</Form.Label>
-							<Form.Control
-								type='address'
-								placeholder='Enter address'
-								disabled={isLoading}
-								value={address}
-								onChange={(e) => setAddress(e.target.value)}
 							></Form.Control>
 						</Form.Group>
 						<Form.Group className='my-2' controlId='phone'>
@@ -350,10 +343,6 @@ const RegisterScreen = () => {
 				<Button disabled={isLoading} type='submit' variant='primary'>
 					Register
 				</Button>
-
-				{isEmailValidLoading && <Loader />}
-
-				{isLoading && <Loader />}
 			</Form>
 
 			<Row className='py-3'>

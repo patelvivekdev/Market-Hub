@@ -71,14 +71,7 @@ const authUser = asyncHandler(async (req, res) => {
 			userType: user.userType,
 			isActive: user.isActive,
 			profile: user.profile,
-			fullName:
-				user.userType === 'Client'
-					? user.profile.clientName
-					: user.userType === 'Vendor'
-					? user.profile.vendorName
-					: user.userType === 'Admin'
-					? user.profile.adminName
-					: '',
+			fullName: user.profile.name,
 			message: 'User logged in successfully',
 		});
 	} else {
@@ -90,7 +83,12 @@ const authUser = asyncHandler(async (req, res) => {
 
 // Register a new user based on user type (client, vendor, admin) and create a profile for the user
 const registerUser = asyncHandler(async (req, res) => {
-	const { username, email, password, userType, profile } = req.body;
+	// ready data for save to database
+	let email = req.body.email.toLowerCase();
+	let username = req.body.username.toLowerCase();
+	let password = req.body.password;
+	let userType = req.body.userType;
+	let profile = req.body.profile;
 
 	// check the user details
 	if (!username || !email || !password) {
@@ -135,11 +133,6 @@ const registerUser = asyncHandler(async (req, res) => {
 				message: 'Please enter a valid phone number',
 			});
 		}
-		if (!profile.address) {
-			return res.status(400).json({
-				message: 'Please enter a valid address',
-			});
-		}
 		if (!profile.name) {
 			return res.status(400).json({
 				message: 'Please enter a valid name',
@@ -157,9 +150,8 @@ const registerUser = asyncHandler(async (req, res) => {
 			});
 		} else {
 			userDetails = await Client.create({
-				clientName: profile.name,
+				name: profile.name,
 				phone: profile.phone,
-				address: profile.address,
 			});
 		}
 	} else if (userType === 'Vendor') {
@@ -190,7 +182,7 @@ const registerUser = asyncHandler(async (req, res) => {
 			});
 		} else {
 			userDetails = await Vendor.create({
-				vendorName: profile.name,
+				name: profile.name,
 				phone: profile.phone,
 				address: profile.address,
 				website: profile.website || '',
@@ -265,8 +257,9 @@ const registerUser = asyncHandler(async (req, res) => {
 			<p>Thank you for registering with us.</p>
 
 			<p>Please go to this link to verify your account</p>
-			<a href=${verifyUrl} clicktracking=off>${verifyUrl}</a>
-
+				<button style="background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; display: inline-block; font-size: 16px;">
+					<a href=${verifyUrl} target="_blank">${verifyUrl}</a>
+				</button>
 			<p>Regards,</p>
 			<p>Team</p>
 		`;
@@ -293,14 +286,7 @@ const registerUser = asyncHandler(async (req, res) => {
 			userType: user_info.userType,
 			isActive: user_info.isActive,
 			profile: user_info.profile,
-			fullName:
-				user_info.userType === 'Client'
-					? user_info.profile.clientName
-					: user_info.userType === 'Vendor'
-					? user_info.profile.vendorName
-					: user_info.userType === 'Admin'
-					? user_info.profile.adminName
-					: '',
+			fullName: user_info.profile.name,
 			message: 'Account crated successfully',
 		});
 	} else {
