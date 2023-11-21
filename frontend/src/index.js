@@ -99,7 +99,7 @@ const routes = createBrowserRouter(
 					element={<UpdateProfileScreen />}
 				/>
 				<Route
-					path='/:userType/profile/update-password'
+					path='/:userType/profile/change-password'
 					element={<ChangePasswordScreen />}
 				/>
 			</Route>

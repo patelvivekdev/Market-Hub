@@ -50,6 +50,20 @@ const checkEmail = asyncHandler(async (req, res) => {
 
 // Auth user & send token in Cookie
 const authUser = asyncHandler(async (req, res) => {
+	// check if user is already logged in
+	if (req.user) {
+		return res.status(200).json({
+			_id: req.user._id,
+			email: req.user.email,
+			username: req.user.username || req.user.email,
+			userType: req.user.userType,
+			isActive: req.user.isActive,
+			profile: req.user.profile,
+			fullName: req.user.profile.name,
+			message: 'User logged in successfully',
+		});
+	}
+
 	const { email, password } = req.body;
 
 	// check the user details
@@ -473,6 +487,7 @@ const validateAccount = asyncHandler(async (req, res) => {
 	}
 
 	user.isActive = true;
+	user.isEmailVerified = true;
 	await user.save();
 
 	// delete token

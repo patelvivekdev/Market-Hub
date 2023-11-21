@@ -58,7 +58,8 @@ const ChangePasswordScreen = () => {
 				toastId: 'changePasswordToastId',
 				autoClose: 1000,
 			});
-			navigate('/');
+			// navigate to back 
+			navigate(-1);
 		} catch (error) {
 			showErrorToast(
 				error?.data?.message || error?.response?.data?.message || 'Something went wrong while login! Please try again later.',
