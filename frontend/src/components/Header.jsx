@@ -156,6 +156,16 @@ const Header = () => {
                       <FaUser /> About Us
                     </Nav.Link>
                   </LinkContainer>
+                  <LinkContainer to='/contact-us'>
+                    <Nav.Link>
+                      <FaUser /> Contact Us
+                    </Nav.Link>
+                  </LinkContainer>
+                  <LinkContainer to='/faq'>
+                    <Nav.Link>
+                      <FaUser /> FAQ
+                    </Nav.Link>
+                  </LinkContainer>
                 </>
               )}
 

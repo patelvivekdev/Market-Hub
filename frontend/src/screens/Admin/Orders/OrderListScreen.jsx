@@ -50,7 +50,7 @@ const OrderListScreen = () => {
               <th>TOTAL</th>
               <th>PAID</th>
               <th>DELIVERED</th>
-              <th></th>
+              <th>DETAILS</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -83,9 +83,26 @@ const OrderListScreen = () => {
                   </LinkContainer>
                 </td>
                 <td>
-                  <Button variant='success' className='btn-sm btn' onClick={() => deliverOrderHandler(order._id)}>
-                    Mark as Delivered
-                  </Button>
+                  {
+                    order.isDelivered ? (
+                      <Button
+                        variant='light'
+                        className='btn-sm'
+                        disabled
+                      >
+                        Delivered
+                      </Button>
+                    ) : (
+                      <Button
+                        variant='success'
+                        className='btn-sm'
+                        onClick={() => deliverOrderHandler(order._id)}
+                      >
+                        Mark as Delivered
+                      </Button>
+                    )
+                  }
+
                 </td>
               </tr>
             ))}

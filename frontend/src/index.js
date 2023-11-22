@@ -9,6 +9,8 @@ import App from './App';
 // SCREENS
 import HomeScreen from './screens/HomeScreen';
 import AboutUs from './screens/AboutScreen';
+import ContactUsScreen from './screens/ContactUsScreen';
+import FAQScreen from './screens/FAQScreen';
 
 // AUTH SCREENS
 import RegisterScreen from './screens/Auth/RegisterScreen';
@@ -65,6 +67,10 @@ const routes = createBrowserRouter(
 			<Route index={true} path='/' element={<HomeScreen />} />
 
 			<Route path='/about' element={<AboutUs />} />
+
+			<Route path='/contact-us' element={<ContactUsScreen />} />
+
+			<Route path='/faq' element={<FAQScreen />} />
 
 			{/* AUTH ROUTES */}
 			<Route path='/login' element={<LoginScreen />} />
