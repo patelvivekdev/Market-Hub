@@ -293,7 +293,6 @@ const addProductReview = asyncHandler(async (req, res) => {
 	const { rating, reviewMessage } = req.body;
 	const productId = req.params.id;
 
-	console.log(productId);
 	const reviewer = req.user._id;
 
 	// Validate data
@@ -329,14 +328,15 @@ const addProductReview = asyncHandler(async (req, res) => {
 					product: productId,
 				},
 			},
+			isPaid: true,
+			isDelivered: true,
 		});
 
 		if (!hasOrdered) {
 			return res.status(401).json({
-				message: 'You can only review products you have ordered',
+				message: 'You can only review products you have ordered (paid AND delivered)!',
 			});
 		}
-
 		// Create the review
 		const newReview = {
 			rating,
