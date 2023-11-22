@@ -277,9 +277,9 @@ const ProductScreen = () => {
 									</Row>
 								</ListGroup.Item>
 							))}
-							<ListGroup.Item className="mt-5" style={{ borderTop: '1px solid #dee2e6' }}>
-								{isClient && product.countInStock > 0 && (
-									<>
+							{isClient && product.countInStock > 0 && (
+								<>
+									<ListGroup.Item className="mt-5" style={{ borderTop: '1px solid #dee2e6' }}>
 										<h2 className="my-3">Write a Customer Review</h2>
 										<Form>
 											<Form.Group controlId='rating'>
@@ -315,9 +315,9 @@ const ProductScreen = () => {
 												Submit
 											</Button>
 										</Form>
-									</>
-								)}
-							</ListGroup.Item>
+									</ListGroup.Item>
+								</>
+							)}
 						</ListGroup>
 					</Col>
 				</Row>
