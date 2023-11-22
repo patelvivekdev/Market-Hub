@@ -12,7 +12,9 @@ const protect = AsyncHandler(async (req, res, next) => {
 			const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
 			// Set req.user to the user that is decoded from the token
-			req.user = await User.findById(decoded.id).select('-password');
+			req.user = await User.findById(decoded.id)
+				.populate('profile')
+				.select('-password');
 			req.userType = decoded.userType;
 			next();
 		} catch (error) {
@@ -22,7 +24,7 @@ const protect = AsyncHandler(async (req, res, next) => {
 		}
 	} else {
 		return res.status(401).json({
-			message: 'Not authorized, no token',
+			message: 'Please login to do this action',
 		});
 	}
 });

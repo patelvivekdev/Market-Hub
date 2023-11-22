@@ -12,6 +12,7 @@ import {
 	changeProductImage,
 	getProductsByVendor,
 	getProductsByCategory,
+	addProductReview,
 } from '../controllers/productController.js';
 
 import {
@@ -38,6 +39,9 @@ router
 
 // Change product image
 router.route('/:id/image').put(protect, vendor, uploader, changeProductImage);
+
+// Add review to product
+router.route('/:id/review').post(protect, addProductReview);
 
 // get all products by category id
 router.route('/category/:id').get(getProductsByCategory);

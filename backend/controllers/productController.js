@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 
 import { uploadImage, deleteImage } from '../utils/firebase.js';
 import Product from '../models/productModel.js';
+import Order from '../models/orderModel.js';
 
 // Create Endpoint to get all products
 // @route GET /api/v1/products
@@ -21,7 +22,8 @@ const getProducts = asyncHandler(async (req, res) => {
 const getProductById = asyncHandler(async (req, res) => {
 	const product = await Product.findById(req.params.id)
 		.populate('vendor')
-		.populate('category');
+		.populate('category')
+		.populate('reviews.reviewer');
 	if (product) {
 		return res.json(product);
 	} else {
@@ -71,6 +73,7 @@ const createProduct = asyncHandler(async (req, res) => {
 		category,
 		countInStock,
 		description,
+		numReviews: 0,
 	});
 
 	if (image_url) {
@@ -283,6 +286,88 @@ const getProductsByCategory = asyncHandler(async (req, res) => {
 	return res.json(products);
 });
 
+// Create new review
+// @route POST /api/v1/products/:id/reviews
+
+const addProductReview = asyncHandler(async (req, res) => {
+	const { rating, reviewMessage } = req.body;
+	const productId = req.params.id;
+
+	console.log(productId);
+	const reviewer = req.user._id;
+
+	// Validate data
+	if (!rating || !reviewMessage) {
+		return res
+			.status(400)
+			.json({ message: 'Please provide rating and review message' });
+	}
+
+	try {
+		const product = await Product.findById(productId);
+
+		if (!product) {
+			return res.status(404).json({ message: 'Product not found' });
+		}
+
+		// Check if the user has already reviewed this product
+		const alreadyReviewed = product.reviews.find(
+			(review) => review.reviewer.toString() === reviewer.toString()
+		);
+
+		if (alreadyReviewed) {
+			return res.status(400).json({
+				message: 'You have already reviewed this product',
+			});
+		}
+
+		// Check if the user has ordered this product
+		const hasOrdered = await Order.exists({
+			user: reviewer,
+			orderItems: {
+				$elemMatch: {
+					product: productId,
+				},
+			},
+		});
+
+		if (!hasOrdered) {
+			return res.status(401).json({
+				message: 'You can only review products you have ordered',
+			});
+		}
+
+		// Create the review
+		const newReview = {
+			rating,
+			reviewMessage,
+			reviewer,
+		};
+
+		// Add the review to the product's reviews array
+		product.reviews.push(newReview);
+		product.numReviews = product.reviews.length;
+		// Calculate the new average rating if needed and update the product's overall rating
+		if (product.numReviews > 1) {
+			product.rating =
+				product.reviews.reduce(
+					(acc, item) => item.rating + acc,
+					0
+				) / product.reviews.length;
+		} else {
+			product.rating = rating;
+		}
+
+		await product.save();
+
+		return res.status(201).json({ message: 'Review added successfully' });
+	} catch (error) {
+		return res
+			.status(500)
+			.json({ message: 'Failed to add review', error: error });
+	}
+});
+
 export {
 	getProducts,
 	getProductById,
@@ -292,4 +377,5 @@ export {
 	changeProductImage,
 	getProductsByVendor,
 	getProductsByCategory,
+	addProductReview,
 };
