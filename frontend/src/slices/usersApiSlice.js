@@ -30,6 +30,12 @@ export const userApiSlice = apiSlice.injectEndpoints({
 				method: 'POST',
 			}),
 		}),
+		sendVerifyEmail: builder.mutation({
+			query: () => ({
+				url: `${USERS_URL}/verify`,
+				method: 'POST',
+			}),
+		}),
 		verify: builder.mutation({
 			query: (verifyToken) => ({
 				url: `${USERS_URL}/verify/${verifyToken}`,
@@ -132,4 +138,5 @@ export const {
 	useChangePasswordMutation,
 	useUploadProfilePicMutation,
 	useGetAllVendorsQuery,
+	useSendVerifyEmailMutation,
 } = userApiSlice;

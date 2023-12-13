@@ -27,6 +27,7 @@ import {
 	logoutUser,
 	uploadProfilePic,
 	getAllVendors,
+	sendVerifyEmail,
 } from '../controllers/userController.js';
 
 import { uploader } from '../middleware/uploadMiddleware.js';
@@ -43,6 +44,7 @@ router
 	.get(protect, admin, getUsers);
 
 // Verify route
+router.route('/verify').post(protect, sendVerifyEmail);
 router.route('/verify/:verifyToken').post(validateAccount);
 
 // Auth route

@@ -7,7 +7,7 @@ import { useGetMyOrdersQuery } from "../slices/orderSlice"
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import { formattedDateTime } from "../utils/utils";
-import { useGetUserProfileQuery, useUploadProfilePicMutation } from '../slices/usersApiSlice'
+import { useGetUserProfileQuery, useUploadProfilePicMutation, useSendVerifyEmailMutation } from '../slices/usersApiSlice'
 import { toast } from "react-toastify";
 
 const ProfileScreen = () => {
@@ -19,6 +19,19 @@ const ProfileScreen = () => {
   const { data: orders, isLoading, error } = useGetMyOrdersQuery();
 
   const [uploadProfilePic, { isLoading: isImageUploading }] = useUploadProfilePicMutation();
+  const [sendVerifyEmail, { isLoading: isSendVerifyEmailLoading }] = useSendVerifyEmailMutation();
+
+
+
+  const isVerified = userInfo?.isEmailVerified;
+
+  const sendVerificationEmail = async (e) => {
+    await sendVerifyEmail().unwrap();
+    toast.success('Verification email sent successfully', {
+      toastId: 'sendVerifyEmailToastId',
+      autoClose: 1000,
+    });
+  }
 
   const handleImageChange = async (e) => {
     setShowModal(false);
@@ -52,7 +65,9 @@ const ProfileScreen = () => {
     }
   }
 
-  if (isProfileLoading) return <Loader />;
+  if (isProfileLoading || isLoading || isImageUploading || isSendVerifyEmailLoading) {
+    return <Loader />;
+  }
 
   return (
     <>
@@ -65,6 +80,19 @@ const ProfileScreen = () => {
       ) : (
         <>
           {isImageUploading && <Loader />}
+
+          {!isVerified && (
+            <Message variant='warning'>
+              Please verify your email address.{' '}
+              <Button
+                variant='link'
+                onClick={sendVerificationEmail}
+                className='p-0'
+              >
+                Resend verification email
+              </Button>
+            </Message>
+          )}
           <Row>
             <Col md={5} className="mt-4">
               <h2>User Profile</h2>

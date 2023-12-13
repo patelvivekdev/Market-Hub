@@ -82,13 +82,13 @@ const Header = () => {
           <Navbar.Collapse id='basic-navbar-nav'>
             <Nav className='ms-auto'>
               {/* Client Links */}
-              <LinkContainer to='/store/category/All/vendor/All'>
-                <Nav.Link>
-                  <FaCartPlus /> Products
-                </Nav.Link>
-              </LinkContainer>
               {userInfo && userInfo.userType === 'Client' && (
                 <>
+                  <LinkContainer to='/store/category/All/vendor/All'>
+                    <Nav.Link>
+                      <FaCartPlus /> Products
+                    </Nav.Link>
+                  </LinkContainer>
                   <LinkContainer to='/cart'>
                     <Nav.Link>
                       <FaShoppingCart /> Cart

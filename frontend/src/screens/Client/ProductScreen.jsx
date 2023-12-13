@@ -95,6 +95,15 @@ const ProductScreen = () => {
 	};
 
 	const addToCartHandler = () => {
+		//check if the user is verified
+		if (!userInfo?.profile?.isVerified) {
+			return toast.error('Please verify your email address', {
+				toastId: 'addToCartToastId',
+				autoClose: 1000,
+			});
+		}
+
+
 		dispatch(addToCart({ ...product, qty }));
 		navigate('/cart');
 	};

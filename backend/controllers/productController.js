@@ -66,6 +66,13 @@ const createProduct = asyncHandler(async (req, res) => {
 	// Get vendor from token
 	const vendor = req.user.profile._id;
 
+	// check if vendor has verified their email
+	if (!req.user.isVerified) {
+		return res.status(401).json({
+			message: 'Please verify your email before adding a product',
+		});
+	}
+
 	// Validate data
 	if (!name || !price || !category || !countInStock || !description) {
 		return res.status(400).json({

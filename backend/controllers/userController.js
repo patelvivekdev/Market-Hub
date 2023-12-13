@@ -60,6 +60,7 @@ const authUser = asyncHandler(async (req, res) => {
 			isActive: req.user.isActive,
 			profile: req.user.profile,
 			fullName: req.user.profile.name,
+			isEmailVerified: req.user.isEmailVerified,
 			message: 'User logged in successfully',
 		});
 	}
@@ -86,6 +87,7 @@ const authUser = asyncHandler(async (req, res) => {
 			isActive: user.isActive,
 			profile: user.profile,
 			fullName: user.profile.name,
+			isEmailVerified: user.isEmailVerified,
 			message: 'User logged in successfully',
 		});
 	} else {
@@ -301,6 +303,7 @@ const registerUser = asyncHandler(async (req, res) => {
 			isActive: user_info.isActive,
 			profile: user_info.profile,
 			fullName: user_info.profile.name,
+			isEmailVerified: user_info.isEmailVerified,
 			message: 'Account crated successfully',
 		});
 	} else {
@@ -459,6 +462,62 @@ const uploadProfilePic = asyncHandler(async (req, res) => {
 				message: 'Please upload a file',
 			});
 		}
+	} else {
+		return res.status(401).json({
+			message: 'User not found',
+		});
+	}
+});
+
+const sendVerifyEmail = asyncHandler(async (req, res) => {
+	console.log('sendVerifyEmail');
+	console.log(req.user);
+	const user = await User.findById(req.user._id);
+
+	if (user) {
+		// create token
+		const token = crypto.randomBytes(32).toString('hex');
+
+		// check if token exists
+		const tokenExists = await TokenModel.findOne({ email: user.email });
+
+		if (tokenExists) {
+			// delete token
+			TokenModel.deleteOne({ email: tokenExists.email });
+		}
+
+		const validateAccount = await TokenModel.create({
+			email: user.email,
+			token: token,
+		});
+
+		const verifyUrl = `${BASE_URL}/verify-account/${token}`;
+
+		// send email
+		const message = `
+			<h1>Please click the below link to verify account.</h1>
+			<button style="background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; display: inline-block; font-size: 16px;">
+				<a href=${verifyUrl} target="_blank">${verifyUrl}</a>
+			</button>
+			<p>Regards,</p>
+			<p>Team</p>
+		`;
+		try {
+			await sendMail({
+				To: user.email,
+				Subject: 'Verification Email',
+				HTMLPart: message,
+			});
+		} catch (error) {
+			// delete token
+			TokenModel.deleteOne({ token: validateAccount });
+			console.log("--> Error: Can't send email", error);
+		}
+
+		return res.status(200).json({
+			success: true,
+			message: 'Email sent successfully.',
+		});
 	} else {
 		return res.status(401).json({
 			message: 'User not found',
@@ -804,10 +863,11 @@ const updateUser = asyncHandler(async (req, res) => {
 	}
 });
 
-
 // Get all vendors
 const getAllVendors = asyncHandler(async (req, res) => {
-	const vendors = await User.find({ userType: 'Vendor' }).populate('profile');
+	const vendors = await User.find({ userType: 'Vendor' }).populate(
+		'profile'
+	);
 	res.json(vendors);
 });
 
@@ -828,5 +888,6 @@ export {
 	validateAccount,
 	logoutUser,
 	uploadProfilePic,
-	getAllVendors
+	getAllVendors,
+	sendVerifyEmail,
 };
