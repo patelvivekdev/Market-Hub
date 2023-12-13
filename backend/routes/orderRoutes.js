@@ -8,6 +8,7 @@ import {
 	markOrderToPaid,
 	markOrderToDelivered,
 	getOrdersByUserId,
+	cancelOrder,
 } from '../controllers/orderController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
@@ -16,5 +17,6 @@ router.route('/mine').get(protect, getOrdersByUserId);
 router.route('/:id').get(protect, getOrderById);
 router.route('/:id/pay').put(protect, markOrderToPaid);
 router.route('/:id/deliver').put(protect, admin, markOrderToDelivered);
+router.route('/:id/cancel').put(protect, admin, cancelOrder);
 
 export default router;

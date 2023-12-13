@@ -11,10 +11,13 @@ import {
 import { formattedDate, formattedDateTime } from '../../utils/utils';
 import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
 import { useEffect } from 'react';
-
+import { useSelector } from 'react-redux';
 
 const OrderScreen = () => {
   const { id: orderId } = useParams();
+
+  const { userInfo } = useSelector((state) => state.auth);
+  const isClient = userInfo.userType === 'Client'
 
   const {
     data: order,
@@ -143,13 +146,36 @@ const OrderScreen = () => {
                 <strong>Method: </strong>
                 {order.paymentMethod}
               </p>
-              {order.isPaid ? (
+              {order.isCancelled ? (
+                <Message variant='danger'>Cancelled</Message>
+              ) : order.isPaid ? (
                 <Message variant='success'>
                   Paid on {formattedDateTime(order.paidAt)}
-                </Message>
-              ) : (
+                </Message>) : (
                 <Message variant='danger'>Not Paid</Message>
-              )}
+              )
+              }
+              {
+                order.isPaid && order.isCancelled && (
+                  <>
+                    <Message variant='danger'>
+                      <p>
+                        Your payment ID is <strong>{order.paymentResult.id}</strong>
+                      </p>
+                      <p>
+                        Your payment status is <strong>{order.paymentResult.status}</strong>
+                      </p>
+                      <p>
+                        Your payment update time is <strong>{formattedDateTime(order.paymentResult.update_time)}</strong>
+                      </p>
+
+                      <p>
+                        Your amount will be refunded to <strong>{order.paymentResult.email_address}</strong>
+                      </p>
+                    </Message>
+                  </>
+                )
+              }
             </ListGroup.Item>
 
             <ListGroup.Item>
@@ -215,7 +241,8 @@ const OrderScreen = () => {
                   <Col>${order.totalPrice}</Col>
                 </Row>
               </ListGroup.Item>
-              {!order.isPaid && (
+              {/* if order is not paid and if user is client show button */}
+              {!order.isPaid && isClient && (
                 <ListGroup.Item>
                   {loadingPay && <Loader />}
                   {isPending ? (
@@ -223,11 +250,12 @@ const OrderScreen = () => {
                   ) : (
                     <div>
                       {/* <Button
-                        style={{ marginBottom: '10px' }}
-                        onClick={payOrderHandler}
-                      >
-                        Test Pay Order
-                      </Button> */}
+                              style={{ marginBottom: '10px' }}
+                              onClick={payOrderHandler}
+                            >
+                              Test Pay Order
+                            </Button> */
+                      }
                       <div>
                         <PayPalButtons
                           createOrder={createOrder}
@@ -237,7 +265,6 @@ const OrderScreen = () => {
                       </div>
                     </div>
                   )}
-
                 </ListGroup.Item>
               )}
             </ListGroup>

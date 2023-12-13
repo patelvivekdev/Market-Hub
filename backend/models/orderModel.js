@@ -91,6 +91,14 @@ const orderSchema = mongoose.Schema(
 			update_time: { type: String },
 			email_address: { type: String },
 		},
+		isCancelled: {
+			type: Boolean,
+			required: true,
+			default: false,
+		},
+		cancelledAt: {
+			type: Date,
+		},
 	},
 	{
 		timestamps: true,

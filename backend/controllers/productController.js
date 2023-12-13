@@ -221,8 +221,12 @@ const deleteProduct = asyncHandler(async (req, res) => {
 	try {
 		await Product.findByIdAndDelete(req.params.id);
 
-		// Delete image from firebase storage
-		await deleteImage(product.image);
+		try {
+			// Delete image from firebase storage
+			await deleteImage(product.image);
+		} catch (error) {
+			console.log(error);
+		}
 
 		return res
 			.status(201)

@@ -48,6 +48,14 @@ const addOrderItems = asyncHandler(async (req, res) => {
 
 		const createdOrder = await order.save();
 
+		orderItems.forEach(async (item) => {
+			const product = await Product.findById(item._id);
+			if (product) {
+				product.countInStock -= item.qty;
+				await product.save();
+			}
+		});
+
 		res.status(201).json({
 			message: 'Order created successfully',
 			order: createdOrder,
@@ -147,6 +155,39 @@ const getOrders = asyncHandler(async (req, res) => {
 	res.json(orders);
 });
 
+// @desc    Cancel order
+// @route   GET /api/orders/:id/cancel
+// @access  Private/Admin
+const cancelOrder = asyncHandler(async (req, res) => {
+	const order = await Order.findById(req.params.id);
+
+	if (!order) {
+		return res.status(404).json({ message: 'Order not found' });
+	}
+
+	// check if order is paid
+	if (!order.isPaid) {
+		order.isCancelled = true;
+		order.cancelledAt = Date.now();
+		return res.status(200).json({ message: 'Order cancelled' });
+	} else if (order.isDelivered) {
+		return res
+			.status(400)
+			.json({ message: 'Order is already delivered' });
+	} else if (order.isCancelled) {
+		return res
+			.status(400)
+			.json({ message: 'Order is already cancelled' });
+	}
+
+	order.isCancelled = true;
+	order.cancelledAt = Date.now();
+
+	const updatedOrder = await order.save();
+
+	return res.json(updatedOrder);
+});
+
 export {
 	addOrderItems,
 	getOrderById,
@@ -154,4 +195,5 @@ export {
 	markOrderToPaid,
 	markOrderToDelivered,
 	getOrdersByUserId,
+	cancelOrder,
 };
