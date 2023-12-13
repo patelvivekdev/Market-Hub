@@ -43,6 +43,11 @@ app.use('/api/v1/orders', orderRoutes);
 
 app.post('reset-password', forgotPassword);
 
+// PayPal
+app.get('/api/v1/config/paypal', (req, res) =>
+	res.send({ clientId: process.env.PAYPAL_CLIENT_ID })
+);
+
 if (process.env.NODE_ENV === 'PRODUCTION') {
 	const __dirname = path.resolve();
 	app.use(express.static(path.join(__dirname, '/frontend/build')));

@@ -1,7 +1,6 @@
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import { Button, Card, Col, Row } from "react-bootstrap";
-import Stack from 'react-bootstrap/Stack';
 import { Link, useNavigate } from "react-router-dom";
 import { useGetTopProductsQuery } from "../slices/productsApiSlice";
 import { FaRocket, FaUmbrellaBeach, FaHeadset } from "react-icons/fa";

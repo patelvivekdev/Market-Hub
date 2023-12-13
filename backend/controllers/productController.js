@@ -12,11 +12,6 @@ const getProducts = asyncHandler(async (req, res) => {
 	const pageSize = process.env.PAGE_SIZE || 3;
 	const page = Number(req.query.pageNumber) || 1;
 
-	console.log('page', page);
-	console.log('pageSize', pageSize);
-	console.log('Vendor', req.query.vendor);
-	console.log('Category', req.query.category);
-
 	// vendor
 	const vendor = req.query.vendor || '';
 

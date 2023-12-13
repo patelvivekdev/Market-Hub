@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import Order from '../models/orderModel.js';
 import Product from '../models/productModel.js';
 import { calcPrices } from '../utils/calcPrices.js';
+import { verifyPayPalPayment, checkIfNewTransaction } from '../utils/paypal.js';
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -74,12 +75,28 @@ const getOrderById = asyncHandler(async (req, res) => {
 const markOrderToPaid = asyncHandler(async (req, res) => {
 	const order = await Order.findById(req.params.id);
 
+	const { verified, value } = await verifyPayPalPayment(req.body.id);
+	if (!verified) {
+		return res.status(400).json({ message: 'Payment not verified' });
+	}
+
+	const isNewTransaction = await checkIfNewTransaction(Order, req.body.id);
+	if (!isNewTransaction) {
+		return res.status(400).json({ message: 'Payment already processed' });
+	}
+
 	if (!order) {
 		return res.status(404).json({ message: 'Order not found' });
 	}
 
 	order.isPaid = true;
 	order.paidAt = Date.now();
+	order.paymentResult = {
+		id: req.body.id,
+		status: req.body.status,
+		update_time: req.body.update_time,
+		email_address: req.body.payer.email_address,
+	};
 
 	const updatedOrder = await order.save();
 
