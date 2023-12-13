@@ -96,7 +96,7 @@ const ProductScreen = () => {
 
 	const addToCartHandler = () => {
 		//check if the user is verified
-		if (!userInfo?.profile?.isVerified) {
+		if (!userInfo?.isEmailVerified) {
 			return toast.error('Please verify your email address', {
 				toastId: 'addToCartToastId',
 				autoClose: 1000,

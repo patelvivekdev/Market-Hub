@@ -67,7 +67,7 @@ const createProduct = asyncHandler(async (req, res) => {
 	const vendor = req.user.profile._id;
 
 	// check if vendor has verified their email
-	if (!req.user.isVerified) {
+	if (!req.user.isEmailVerified) {
 		return res.status(401).json({
 			message: 'Please verify your email before adding a product',
 		});
