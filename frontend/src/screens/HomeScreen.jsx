@@ -8,6 +8,7 @@ import { IconContext } from "react-icons";
 
 
 import cover from '../assets/cover.png';
+import Meta from "../components/Meta";
 
 const HomeScreen = () => {
 	const navigate = useNavigate();
@@ -20,6 +21,8 @@ const HomeScreen = () => {
 
 	return (
 		<>
+			<Meta title='Welcome To Market-Hub' description='Market Place is a web application that allows users to buy and sell products at single place.' keywords='market hub, buy computer parts, sell parts, paypal, cheap electronics' />
+
 			{/* Hero */}
 			<section style={{ padding: '80px 0' }}>
 				<div className='hero'>
@@ -159,52 +162,55 @@ const HomeScreen = () => {
 
 						{/* If products are available show them */}
 						{products.map((product) => (
-							<Col className='mt-4' key={product._id} sm={12} md={6} lg={4}>
-								<Card className='mb-3 h-100 d-flex'
-									style={{ boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)', transition: 'box-shadow 0.3s ease-in-out' }}
-									onMouseOver={(e) => { e.currentTarget.style.boxShadow = '0px 8px 20px rgba(0, 0, 0, 0.5)' }}
-									onMouseOut={(e) => { e.currentTarget.style.boxShadow = '0px 4px 12px rgba(0, 0, 0, 0.1)' }}>
-									<div style={{ height: '200px', overflow: 'hidden', borderRadius: '5px 5px 0 0' }}>
-										<img
-											src={product.image} // Replace with the path to your product image
-											alt={product.name}
-											className='img-fluid'
-											style={{ width: '100%', objectFit: 'cover', height: '100%' }}
-										/>
-									</div>
-									<Card.Body className='d-flex flex-column'>
-										<Card.Title>{product.name}</Card.Title>
-										<Card.Text>{product.description}</Card.Text>
-										<Card.Text className='text-muted'>
-											Category : <span className='badge rounded-pill' style={{ backgroundColor: '#E98E0D', color: 'white' }}>
-												<Link
-													style={{
+							<>
+								<Meta title={product.name} description={product.description} />
+								<Col className='mt-4' key={product._id} sm={12} md={6} lg={4}>
+									<Card className='mb-3 h-100 d-flex'
+										style={{ boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)', transition: 'box-shadow 0.3s ease-in-out' }}
+										onMouseOver={(e) => { e.currentTarget.style.boxShadow = '0px 8px 20px rgba(0, 0, 0, 0.5)' }}
+										onMouseOut={(e) => { e.currentTarget.style.boxShadow = '0px 4px 12px rgba(0, 0, 0, 0.1)' }}>
+										<div style={{ height: '200px', overflow: 'hidden', borderRadius: '5px 5px 0 0' }}>
+											<img
+												src={product.image} // Replace with the path to your product image
+												alt={product.name}
+												className='img-fluid'
+												style={{ width: '100%', objectFit: 'cover', height: '100%' }}
+											/>
+										</div>
+										<Card.Body className='d-flex flex-column'>
+											<Card.Title>{product.name}</Card.Title>
+											<Card.Text>{product.description}</Card.Text>
+											<Card.Text className='text-muted'>
+												Category : <span className='badge rounded-pill' style={{ backgroundColor: '#E98E0D', color: 'white' }}>
+													<Link
+														style={{
+															color: 'white',
+															textDecoration: 'none'
+														}}
+														to={`/store/category/${product.category._id}`}>{product.category.name}</Link>
+												</span>
+											</Card.Text>
+
+											{/* vendor */}
+											<Card.Text className='text-muted'>
+												Vendor : <span className='badge rounded-pill' style={{ backgroundColor: '#1536F1', color: 'white' }}>
+													<Link style={{
 														color: 'white',
 														textDecoration: 'none'
-													}}
-													to={`/store/category/${product.category._id}`}>{product.category.name}</Link>
-											</span>
-										</Card.Text>
-
-										{/* vendor */}
-										<Card.Text className='text-muted'>
-											Vendor : <span className='badge rounded-pill' style={{ backgroundColor: '#1536F1', color: 'white' }}>
-												<Link style={{
-													color: 'white',
-													textDecoration: 'none'
-												}} to={`/store/vendor/${product.vendor._id}`}>{product.vendor.name}</Link>
-											</span>
-										</Card.Text>
-										<Button
-											variant='primary'
-											className='mt-auto my-2'
-											onClick={() => navigate(`/products/${product._id}`)}
-										>
-											View Details
-										</Button>
-									</Card.Body>
-								</Card>
-							</Col>
+													}} to={`/store/vendor/${product.vendor._id}`}>{product.vendor.name}</Link>
+												</span>
+											</Card.Text>
+											<Button
+												variant='primary'
+												className='mt-auto my-2'
+												onClick={() => navigate(`/products/${product._id}`)}
+											>
+												View Details
+											</Button>
+										</Card.Body>
+									</Card>
+								</Col>
+							</>
 						))}
 					</Row>
 				</Col>
