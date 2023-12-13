@@ -119,7 +119,7 @@ const LoginScreen = () => {
 						onChange={(e) => setPassword(e.target.value)}
 					/>
 				</Form.Group>
-				<Button type='submit' variant='primary' disabled={isLoading}>
+				<Button type='submit' variant='primary' id="login" disabled={isLoading}>
 					Sign In
 				</Button>
 				{isLoading && <Loader />}

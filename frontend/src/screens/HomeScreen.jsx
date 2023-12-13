@@ -163,7 +163,6 @@ const HomeScreen = () => {
 						{/* If products are available show them */}
 						{products.map((product) => (
 							<>
-								<Meta title={product.name} description={product.description} />
 								<Col className='mt-4' key={product._id} sm={12} md={6} lg={4}>
 									<Card className='mb-3 h-100 d-flex'
 										style={{ boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)', transition: 'box-shadow 0.3s ease-in-out' }}

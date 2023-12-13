@@ -68,7 +68,7 @@ const AddCategoryScreen = () => {
 						></Form.Control>
 					</Form.Group>
 
-					<Button type="submit" variant="primary">
+					<Button type="submit" id="submit" variant="primary">
 						Create Category
 					</Button>
 				</Form>

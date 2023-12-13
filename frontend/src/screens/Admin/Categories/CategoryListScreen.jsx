@@ -19,7 +19,7 @@ const CategoryListScreen = () => {
 					<h1>Categories</h1>
 				</Col>
 				<Col className='text-right'>
-					<Link to='/Admin/categories/add' className='btn btn-primary my-3'>
+					<Link to='/Admin/categories/add' id="createCategory" className='btn btn-primary my-3'>
 						Create Category
 					</Link>
 				</Col>
