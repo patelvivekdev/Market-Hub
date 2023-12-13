@@ -9,7 +9,7 @@ import { verifyPayPalPayment, checkIfNewTransaction } from '../utils/paypal.js';
 // @access  Private
 const addOrderItems = asyncHandler(async (req, res) => {
 	// check if user has verified their email
-	if (!req.user.isVerified) {
+	if (!req.user.isEmailVerified) {
 		return res.status(401).json({
 			message: 'Please verify your email before adding a product',
 		});
