@@ -3,7 +3,6 @@
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import express from 'express';
-import mongoose from 'mongoose';
 import path from 'path';
 
 import { forgotPassword } from './controllers/userController.js';
@@ -11,6 +10,7 @@ import categoryRoutes from './routes/categoryRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import connectDB from './db/db.js';
 
 import { rateLimitMiddleware } from './middleware/rateLimitMiddleware.js';
 
@@ -21,13 +21,7 @@ dotenv.config();
 const PORT = process.env.PORT || 5000;
 
 // Connect to db
-try {
-	const conn = await mongoose.connect(process.env.MONGO_URI);
-	console.log(`--> INFO: MongoDB Connected: ${conn.connection.host}`);
-} catch (error) {
-	console.error(`--> Error: ${error}`);
-	process.exit(1);
-}
+connectDB();
 
 // Init express
 const app = express();
