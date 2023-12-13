@@ -89,18 +89,16 @@ const OrderScreen = () => {
         toast.success('Order is paid');
       } catch (error) {
         toast.error(
-          error?.response?.data?.message ||
-          error?.data?.message ||
+          error?.data?.message || error?.response?.data?.message || error.data ||
           'An error occurred. Please try again.'
         );
       }
     });
   }
 
-  const onError = (err) => {
+  const onError = (error) => {
     toast.error(
-      err?.response?.data?.message ||
-      err?.data?.message ||
+      error?.data?.message || error?.response?.data?.message || error.data ||
       'An error occurred. Please try again.'
     );
   }

@@ -3,6 +3,13 @@ import express from 'express';
 import { admin, protect } from '../middleware/authMiddleware.js';
 
 import {
+	resetPasswordRateLimitMiddleware,
+	forgotPasswordRateLimitMiddleware,
+	registerRateLimitMiddleware,
+	loginRateLimitMiddleware,
+} from '../middleware/rateLimitMiddleware.js';
+
+import {
 	authUser,
 	registerUser,
 	getUserProfile,
@@ -30,13 +37,16 @@ const router = express.Router();
 router.route('/check').post(checkEmail);
 
 // Base route
-router.route('/').post(registerUser).get(protect, admin, getUsers);
+router
+	.route('/')
+	.post(registerRateLimitMiddleware, registerUser)
+	.get(protect, admin, getUsers);
 
 // Verify route
 router.route('/verify/:verifyToken').post(validateAccount);
 
 // Auth route
-router.post('/auth', authUser);
+router.post('/auth', loginRateLimitMiddleware, authUser);
 
 // Logout route
 router.post('/logout', logoutUser);
@@ -52,8 +62,12 @@ router
 router.route('/profile/pic').put(protect, uploader, uploadProfilePic);
 
 // PASSWORD Route
-router.route('/profile/password').put(protect, updatePassword);
-router.route('/forgot-password').post(forgotPassword);
+router
+	.route('/profile/password')
+	.put(resetPasswordRateLimitMiddleware, protect, updatePassword);
+router
+	.route('/forgot-password')
+	.post(forgotPasswordRateLimitMiddleware, forgotPassword);
 router.route('/reset-password/:resetToken').post(resetPassword);
 
 // get all vendors

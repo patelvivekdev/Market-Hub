@@ -100,8 +100,8 @@ const RegisterScreen = () => {
 				showErrorToast('Email already exists. Please try again with a different email address.');
 				return
 			}
-		} catch (err) {
-			showErrorToast(err?.data?.message || err?.response?.data?.message || 'Something went wrong while checking email! Please try again later.');
+		} catch (error) {
+			showErrorToast(error?.data?.message || error?.response?.data?.message || error.data || 'Something went wrong while checking email! Please try again later.');
 			return
 		}
 
@@ -147,8 +147,8 @@ const RegisterScreen = () => {
 					navigate(redirect);
 					break;
 			}
-		} catch (err) {
-			showErrorToast(err?.data?.message || err?.response?.data?.message || 'Something went wrong while registering! Please try again later.');
+		} catch (error) {
+			showErrorToast(error?.data?.message || error?.response?.data?.message || error.data || 'Something went wrong while registering! Please try again later.');
 		}
 	};
 

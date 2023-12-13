@@ -45,7 +45,7 @@ const PlaceOrderScreen = () => {
 		} catch (error) {
 			toast.error(
 				error?.response?.data?.message ||
-				error?.data?.message ||
+				error?.data?.message || error?.data ||
 				'An error occurred. Please try again.'
 			);
 		}

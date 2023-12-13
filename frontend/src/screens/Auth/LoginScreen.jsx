@@ -87,9 +87,9 @@ const LoginScreen = () => {
 					navigate(redirect);
 					break;
 			}
-		} catch (err) {
+		} catch (error) {
 			showErrorToast(
-				err?.data?.message || err?.response?.data?.message || 'Something went wrong while login! Please try again later.',
+				error?.data?.message || error?.response?.data?.message || error.data || 'Something went wrong while login! Please try again later.',
 				'loginToastId'
 			);
 		}

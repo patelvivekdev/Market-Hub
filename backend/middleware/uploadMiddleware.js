@@ -1,4 +1,3 @@
-import AsyncHandler from 'express-async-handler';
 import multer from 'multer';
 
 const storage = multer.memoryStorage();

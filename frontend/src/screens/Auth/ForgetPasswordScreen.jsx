@@ -33,8 +33,9 @@ const ForgetPasswordForm = () => {
 			});
 			navigate('/');
 		} catch (error) {
+			console.log(error);
 			showErrorToast(
-				error?.data?.message || error?.response?.data?.message || 'Something went wrong! Please try again later.',
+				error?.data?.message || error?.response?.data?.message || error?.data || error.data || 'Something went wrong! Please try again later.',
 				'loginToastId'
 			);
 		}

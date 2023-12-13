@@ -12,6 +12,8 @@ import orderRoutes from './routes/orderRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 
+import { rateLimitMiddleware } from './middleware/rateLimitMiddleware.js';
+
 // dotenv config
 dotenv.config();
 
@@ -31,6 +33,8 @@ try {
 const app = express();
 
 // Middleware
+app.set('trust proxy', 1);
+app.use(rateLimitMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

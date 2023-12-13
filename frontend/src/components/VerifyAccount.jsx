@@ -21,7 +21,7 @@ const VerifyAccount = () => {
 			navigate('/');
 		} catch (error) {
 			toast.error(
-				error?.data?.message || error?.response?.data?.message || 'Something went wrong while verifying your account! Please try again later.',
+				error?.data?.message || error?.response?.data?.message || error?.data || 'Something went wrong while verifying your account! Please try again later.',
 				'verifyAccountToastId'
 			);
 		}
