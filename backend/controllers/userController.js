@@ -804,6 +804,13 @@ const updateUser = asyncHandler(async (req, res) => {
 	}
 });
 
+
+// Get all vendors
+const getAllVendors = asyncHandler(async (req, res) => {
+	const vendors = await User.find({ userType: 'Vendor' }).populate('profile');
+	res.json(vendors);
+});
+
 export {
 	authUser,
 	registerUser,
@@ -821,4 +828,5 @@ export {
 	validateAccount,
 	logoutUser,
 	uploadProfilePic,
+	getAllVendors
 };

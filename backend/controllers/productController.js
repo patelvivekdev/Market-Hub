@@ -1,19 +1,48 @@
 import asyncHandler from 'express-async-handler';
 
 import { uploadImage, deleteImage } from '../utils/firebase.js';
-import Product from '../models/productModel.js';
 import Order from '../models/orderModel.js';
+import Product from '../models/productModel.js';
 
 // Create Endpoint to get all products
 // @route GET /api/v1/products
 
 const getProducts = asyncHandler(async (req, res) => {
-	// populate vendor field and category field
-	const products = await Product.find({})
+	// page number
+	const pageSize = process.env.PAGE_SIZE || 3;
+	const page = Number(req.query.pageNumber) || 1;
+
+	console.log('page', page);
+	console.log('pageSize', pageSize);
+	console.log('Vendor', req.query.vendor);
+	console.log('Category', req.query.category);
+
+	// vendor
+	const vendor = req.query.vendor || '';
+
+	// category
+	const category = req.query.category || '';
+
+	const filters = {};
+
+	if (vendor && vendor !== 'All') {
+		filters.vendor = vendor;
+	}
+
+	if (category && category !== 'All') {
+		filters.category = category;
+	}
+
+	const totalProducts = await Product.countDocuments(filters);
+
+	const products = await Product.find(filters)
+		.limit(pageSize)
+		.skip(pageSize * (page - 1))
 		.populate('vendor')
 		.populate('category');
 
-	return res.json(products);
+	// Return the products and the page number
+	res.json({ products, page, pages: Math.ceil(totalProducts / pageSize) });
 });
 
 // Create Endpoint to get single product
@@ -368,6 +397,18 @@ const addProductReview = asyncHandler(async (req, res) => {
 	}
 });
 
+// @desc    Get top rated products
+// @route   GET /api/products/top
+const getTopProducts = asyncHandler(async (req, res) => {
+	const products = await Product.find({})
+		.sort({ rating: -1 })
+		.limit(3)
+		.populate('vendor')
+		.populate('category');
+
+	return res.json(products);
+});
+
 export {
 	getProducts,
 	getProductById,
@@ -378,4 +419,5 @@ export {
 	getProductsByVendor,
 	getProductsByCategory,
 	addProductReview,
+	getTopProducts,
 };

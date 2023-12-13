@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { Badge, Button, Container, Form, Modal, Nav, NavDropdown, Navbar } from "react-bootstrap";
 import { BiLogOut } from "react-icons/bi";
-import { FaShoppingCart, FaUser, FaUserPlus } from "react-icons/fa";
+import { FaCartPlus, FaShoppingCart, FaUser, FaUserPlus } from "react-icons/fa";
+import { FcAbout } from "react-icons/fc";
+import { MdContactSupport } from "react-icons/md";
+import { FcFaq } from "react-icons/fc";
 import { MdProductionQuantityLimits } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { LinkContainer } from "react-router-bootstrap";
@@ -10,6 +13,8 @@ import { toast } from "react-toastify";
 import { logout } from "../slices/authSlice";
 import { resetCart } from "../slices/cartSlice";
 import { useLogoutMutation } from "../slices/usersApiSlice";
+
+import logo from '../assets/vector/isolated-monochrome-white.svg';
 
 const Header = () => {
   const { cartItems } = useSelector((state) => state.cart);
@@ -70,13 +75,18 @@ const Header = () => {
         <Container>
           <LinkContainer to='/'>
             <Navbar.Brand>
-              <FaShoppingCart /> Market Hub
+              <img src={logo} alt='logo' style={{ height: '30px' }} />
             </Navbar.Brand>
           </LinkContainer>
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
           <Navbar.Collapse id='basic-navbar-nav'>
             <Nav className='ms-auto'>
               {/* Client Links */}
+              <LinkContainer to='/store/category/All/vendor/All'>
+                <Nav.Link>
+                  <FaCartPlus /> Products
+                </Nav.Link>
+              </LinkContainer>
               {userInfo && userInfo.userType === 'Client' && (
                 <>
                   <LinkContainer to='/cart'>
@@ -153,17 +163,17 @@ const Header = () => {
                   </Modal>
                   <LinkContainer to='/about'>
                     <Nav.Link>
-                      <FaUser /> About Us
+                      <FcAbout /> About Us
                     </Nav.Link>
                   </LinkContainer>
                   <LinkContainer to='/contact-us'>
                     <Nav.Link>
-                      <FaUser /> Contact Us
+                      <MdContactSupport /> Contact Us
                     </Nav.Link>
                   </LinkContainer>
                   <LinkContainer to='/faq'>
                     <Nav.Link>
-                      <FaUser /> FAQ
+                      <FcFaq /> FAQ
                     </Nav.Link>
                   </LinkContainer>
                 </>

@@ -105,6 +105,13 @@ export const userApiSlice = apiSlice.injectEndpoints({
 				body: data,
 			}),
 		}),
+		getAllVendors: builder.query({
+			query: () => ({
+				url: `${USERS_URL}/vendors`,
+			}),
+			providesTags: ['User'],
+			keepUnusedDataFor: 5,
+		}),
 	}),
 });
 
@@ -124,4 +131,5 @@ export const {
 	useResetPasswordMutation,
 	useChangePasswordMutation,
 	useUploadProfilePicMutation,
+	useGetAllVendorsQuery,
 } = userApiSlice;

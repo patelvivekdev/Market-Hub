@@ -13,6 +13,7 @@ import {
 	getProductsByVendor,
 	getProductsByCategory,
 	addProductReview,
+	getTopProducts,
 } from '../controllers/productController.js';
 
 import {
@@ -29,6 +30,9 @@ router
 	.route('/')
 	.get(getProducts)
 	.post(protect, vendor, uploader, createProduct);
+
+// Top products route
+router.route('/top').get(getTopProducts);
 
 // Product route
 router

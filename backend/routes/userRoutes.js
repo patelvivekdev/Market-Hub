@@ -19,6 +19,7 @@ import {
 	validateAccount,
 	logoutUser,
 	uploadProfilePic,
+	getAllVendors,
 } from '../controllers/userController.js';
 
 import { uploader } from '../middleware/uploadMiddleware.js';
@@ -54,6 +55,9 @@ router.route('/profile/pic').put(protect, uploader, uploadProfilePic);
 router.route('/profile/password').put(protect, updatePassword);
 router.route('/forgot-password').post(forgotPassword);
 router.route('/reset-password/:resetToken').post(resetPassword);
+
+// get all vendors
+router.route('/vendors').get(getAllVendors);
 
 // Admin routes
 router

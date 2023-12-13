@@ -6,7 +6,7 @@ import Vendor from './../models/vendorModel.js';
 
 // Mock user data
 const userData = {
-	username: 'testuser',
+	username: 'testUser',
 	email: 'testuser@example.com',
 	password: 'Test@1234',
 	userType: 'Client',
@@ -18,11 +18,15 @@ const userData = {
 };
 
 beforeEach(async () => {
-	// Clear database before each test
-	await User.deleteMany();
-	await Client.deleteMany();
-	await Vendor.deleteMany();
-	await Admin.deleteMany();
+	// connect to test db
+	await mongoose.connect(process.env.MONGO_URI_TEST, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+		useCreateIndex: true,
+	});
+
+	// delete test user with email if exists in db
+	await User.deleteOne({ email: userData.email });
 });
 
 describe('User Controller', () => {
@@ -70,7 +74,7 @@ describe('User Controller', () => {
 
 		await request(app)
 			.put(`/api/users/profile/${user._id}`)
-			.send({ username: 'updateduser' })
+			.send({ username: 'updatedUser' })
 			.expect(200);
 	});
 

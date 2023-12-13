@@ -67,9 +67,4 @@ if (process.env.NODE_ENV === 'PRODUCTION') {
 	);
 }
 
-// Listen
-app.listen(PORT, () =>
-	console.log(`--> Server running on: http://localhost:${PORT}`)
-);
-
 export default app;

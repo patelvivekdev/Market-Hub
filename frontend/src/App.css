@@ -9,3 +9,11 @@ main {
 	padding: 20px;
 	text-align: center;
 }
+
+hr {
+	text-align: center;
+	width: 80%;
+	border: 0;
+	height: 3px;
+	background-image: linear-gradient(to right, #1536f1, #e98e0d, #1536f1);
+}

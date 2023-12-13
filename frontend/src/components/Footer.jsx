@@ -9,6 +9,7 @@ const Footer = () => {
         <Row>
           <Col className='text-center py-3'>
             <p>Market Hub &copy; {currentYear}</p>
+            <hr style={{ width: '100%' }} />
             <p>Made with ❤️</p>
           </Col>
         </Row>

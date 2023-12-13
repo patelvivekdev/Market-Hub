@@ -5,9 +5,9 @@
 	"description": "Market Place is a web application that allows users to buy and sell products at single place.",
 	"main": "index.js",
 	"scripts": {
-		"start": "node backend/index.js",
+		"start": "node backend/server.js",
 		"client": "npm start --prefix frontend",
-		"server": "nodemon backend/index.js",
+		"server": "nodemon backend/server.js",
 		"dev": "concurrently \"npm run server\" \"npm run client\"",
 		"build": "npm install && npm install --prefix frontend && npm run build --prefix frontend",
 		"test": "jest --watchAll --verbose"
@@ -41,7 +41,8 @@
 		"jsonwebtoken": "^9.0.2",
 		"mongoose": "^7.5.3",
 		"multer": "^1.4.5-lts.1",
-		"node-mailjet": "^6.0.4"
+		"node-mailjet": "^6.0.4",
+		"react-responsive": "^9.0.2"
 	},
 	"devDependencies": {
 		"concurrently": "^8.2.1",

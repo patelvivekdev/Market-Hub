@@ -60,12 +60,53 @@ import {
 	Route,
 	RouterProvider,
 } from 'react-router-dom';
+import StoreScreen from './screens/StoreScreen';
 
 const routes = createBrowserRouter(
 	createRoutesFromElements(
 		<Route path='/' element={<App />}>
 			<Route index={true} path='/' element={<HomeScreen />} />
 
+			{/* Category */}
+			<Route
+				path='/store/category/:category'
+				element={<StoreScreen />}
+			/>
+
+			{/* Vendor */}
+			<Route path='/store/vendor/:vendor' element={<StoreScreen />} />
+
+			{/* Pagination */}
+			<Route
+				path='/store/page/:pageNumber'
+				element={<StoreScreen />}
+			/>
+
+			{/* Category + Pagination */}
+			<Route
+				path='/store/category/:category/page/:pageNumber'
+				element={<StoreScreen />}
+			/>
+
+			{/* Vendor + Pagination */}
+			<Route
+				path='/store/vendor/:vendor/page/:pageNumber'
+				element={<StoreScreen />}
+			/>
+
+			{/* Category + Vendor */}
+			<Route
+				path='/store/category/:category/vendor/:vendor'
+				element={<StoreScreen />}
+			/>
+
+			{/* Category + Vendor + Pagination */}
+			<Route
+				path='/store/category/:category/vendor/:vendor/page/:pageNumber'
+				element={<StoreScreen />}
+			/>
+
+			{/* About */}
 			<Route path='/about' element={<AboutUs />} />
 
 			<Route path='/contact-us' element={<ContactUsScreen />} />

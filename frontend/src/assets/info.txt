@@ -1,0 +1,18 @@
+
+Hope you enjoy your new logo, here are the people that
+made your beautiful logo happen :)
+font name: Rancho-Regular
+font link: https://fonts.google.com/specimen/Rancho
+font author: Sideshow
+font author site: http://www.fontbros.com/foundries/sideshow
+Slogan Font: Fanwood Text.otf
+
+icon designer: mikicon
+icon designer link: /mikicon
+        
+{"bg-gradient-0":"#E98E0D",
+"bg-gradient-1":"#1536F1",
+"icon":"#ffffff",
+"font":"#ffffff",
+"slogan":"#ffffff"}
+      
