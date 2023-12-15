@@ -19,7 +19,11 @@ export const BASE_URL =
 		? process.env.BASE_URL_DEV
 		: process.env.NODE_ENV === 'PRODUCTION'
 		? process.env.BASE_URL_PROD
-		: process.env.BASE_URL_TEST;
+		: process.env.BASE_URL_PROD;
+
+console.log('--> NODE_ENV', process.env.NODE_ENV);
+
+console.log(process.env.NODE_ENV === 'PRODUCTION');
 
 console.log('--> BASE_URL', BASE_URL);
 
