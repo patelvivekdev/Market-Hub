@@ -27,14 +27,14 @@ const ProductsScreen = () => {
 			setShowDeleteModal(false);
 			toast.success('Product deleted successfully', {
 				toastId: 'deleteProductToastId',
-				autoClose: 1000,
+				autoClose: 2000,
 			});
 		} catch (error) {
 			toast.error(error?.response?.data?.message ||
 				error?.data?.message || error?.data ||
 				'An error occurred. Please try again.', {
 				toastId: 'deleteProductToastId',
-				autoClose: 1000,
+				autoClose: 2000,
 			});
 		}
 	}
@@ -59,70 +59,73 @@ const ProductsScreen = () => {
 				<h3>{isError}</h3>
 			) : (
 				<>
-					<Table striped bordered hover responsive className='table-sm'>
-						<thead>
-							<tr>
-								<th>ID</th>
-								<th>Image</th>
-								<th>NAME</th>
-								<th>PRICE</th>
-								<th>CATEGORY</th>
-								<th>Qty</th>
-								<th>Edit</th>
-								<th>Delete</th>
-							</tr>
-						</thead>
-						<tbody>
-							{products.map((product) => (
-								<tr key={product._id}>
-									<td>
-										<Button
-											variant='dark'
-											onClick={() =>
-												navigate(`/Vendor/products/${product._id}`)
-											}
-										>
-											{product._id}
-										</Button>
-									</td>
-									<td>
-										<Image
-											style={{ width: '100px' }}
-											src={product.image}
-											alt={product.name}
-											fluid
-											rounded
-										/>
-									</td>
-									<td>{product.name}</td>
-									<td>${product.price}</td>
-									<td>{product.category.name}</td>
-									<td>{product.countInStock}</td>
-									<td>
-										<Button
-											variant='light'
-											className='btn'
-											onClick={() =>
-												navigate(`/Vendor/products/${product._id}/edit`)
-											}
-										>
-											<FaEdit />
-										</Button>
-									</td>
-									<td>
-										<Button variant='danger' className='btn' onClick={() => {
-											setShowDeleteModal(true);
-											setProductId(product._id);
-										}}>
-											<FaTrash />
-										</Button>
-									</td>
-								</tr>
-							))}
-						</tbody>
-					</Table>
-
-
+					{
+						products.length === 0 ? (
+							<h3>No Products Found</h3>
+						) : (
+							<Table striped bordered hover responsive className='table-sm'>
+								<thead>
+									<tr>
+										<th>ID</th>
+										<th>Image</th>
+										<th>NAME</th>
+										<th>PRICE</th>
+										<th>CATEGORY</th>
+										<th>Qty</th>
+										<th>Edit</th>
+										<th>Delete</th>
+									</tr>
+								</thead>
+								<tbody>
+									{products.map((product) => (
+										<tr key={product._id}>
+											<td>
+												<Button
+													variant='dark'
+													onClick={() =>
+														navigate(`/Vendor/products/${product._id}`)
+													}
+												>
+													{product._id}
+												</Button>
+											</td>
+											<td>
+												<Image
+													style={{ width: '100px' }}
+													src={product.image}
+													alt={product.name}
+													fluid
+													rounded
+												/>
+											</td>
+											<td>{product.name}</td>
+											<td>${product.price}</td>
+											<td>{product.category.name}</td>
+											<td>{product.countInStock}</td>
+											<td>
+												<Button
+													variant='light'
+													className='btn'
+													onClick={() =>
+														navigate(`/Vendor/products/${product._id}/edit`)
+													}
+												>
+													<FaEdit />
+												</Button>
+											</td>
+											<td>
+												<Button variant='danger' className='btn' onClick={() => {
+													setShowDeleteModal(true);
+													setProductId(product._id);
+												}}>
+													<FaTrash />
+												</Button>
+											</td>
+										</tr>
+									))}
+								</tbody>
+							</Table>
+						)}
 					{showDeleteModal && (
 						<Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
 							<Modal.Header closeButton>

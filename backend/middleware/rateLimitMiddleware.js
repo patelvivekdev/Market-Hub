@@ -8,7 +8,7 @@ const rateLimitMiddleware = rateLimit({
 
 const loginRateLimitMiddleware = rateLimit({
 	windowMs: 20 * 60 * 1000, // 20 minutes
-	max: 3, // limit each IP to 3 requests per windowMs
+	max: 10, // limit each IP to 3 requests per windowMs
 	message: 'Too many requests from this IP, please try again later in 30 minutes',
 });
 

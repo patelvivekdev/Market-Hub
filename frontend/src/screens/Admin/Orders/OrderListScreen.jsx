@@ -100,11 +100,17 @@ const OrderListScreen = () => {
                   )}
                 </td>
                 <td>
-                  {order.isCancelled ? (
-                    formattedDateTime(order.cancelledAt)
-                  ) : (
-                    <FaTimes style={{ color: 'red' }} />
-                  )}
+                  {
+                    order.isDelivered ? (
+                      <p>
+                        Order is Delivered
+                      </p>
+                    ) : order.isCancelled ? (
+                      formattedDateTime(order.cancelledAt)
+                    ) : (
+                      <FaTimes style={{ color: 'red' }} />
+                    )
+                  }
                 </td>
                 <td>
                   <LinkContainer to={`/orders/${order._id}`}>
@@ -144,7 +150,15 @@ const OrderListScreen = () => {
                 </td>
                 <td>
                   {
-                    order.isCancelled ? (
+                    order.isDelivered ? (
+                      <Button
+                        variant='light'
+                        className='btn-sm'
+                        disabled
+                      >
+                        Order is Delivered
+                      </Button>
+                    ) : order.isCancelled ? (
                       <Button
                         variant='light'
                         className='btn-sm'
@@ -162,7 +176,6 @@ const OrderListScreen = () => {
                       </Button>
                     )
                   }
-
                 </td>
               </tr>
             ))}

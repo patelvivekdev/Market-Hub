@@ -35,7 +35,7 @@ const ProductEditScreen = () => {
 	const showErrorToast = (message) => {
 		toast.error(message, {
 			toastId: "addProductToast",
-			autoClose: 1000,
+			autoClose: 2000,
 		});
 	}
 

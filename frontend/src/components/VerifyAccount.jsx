@@ -16,7 +16,7 @@ const VerifyAccount = () => {
 			await verify(verifyToken).unwrap();
 			toast.success(`Account verified successfully.`, {
 				toastId: 'verifyAccountToastId',
-				autoClose: 1000,
+				autoClose: 2000,
 			});
 			navigate('/');
 		} catch (error) {

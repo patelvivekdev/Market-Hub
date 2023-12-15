@@ -12,6 +12,7 @@ import { formattedDate, formattedDateTime } from '../../utils/utils';
 import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import Meta from "../../components/Meta";
 
 const OrderScreen = () => {
   const { id: orderId } = useParams();
@@ -112,6 +113,7 @@ const OrderScreen = () => {
     <Message variant='danger'>{error.data.message}</Message>
   ) : (
     <>
+      <Meta title={`Order ${order._id}`} />
       <h1>Order {order._id}</h1>
       <Row>
         <Col md={8}>
@@ -149,9 +151,23 @@ const OrderScreen = () => {
               {order.isCancelled ? (
                 <Message variant='danger'>Cancelled</Message>
               ) : order.isPaid ? (
-                <Message variant='success'>
-                  Paid on {formattedDateTime(order.paidAt)}
-                </Message>) : (
+                <>
+                  <Message variant='success'>
+                    Paid on {formattedDateTime(order.paidAt)}
+                  </Message>
+                  <Message variant='success'>
+                    <p>
+                      Your payment ID is <strong>{order.paymentResult.id}</strong>
+                    </p>
+                    <p>
+                      Your payment status is <strong>{order.paymentResult.status}</strong>
+                    </p>
+                    <p>
+                      Your payment update time is <strong>{formattedDateTime(order.paymentResult.update_time)}</strong>
+                    </p>
+                  </Message>
+                </>
+              ) : (
                 <Message variant='danger'>Not Paid</Message>
               )
               }

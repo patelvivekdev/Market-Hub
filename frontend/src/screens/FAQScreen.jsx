@@ -7,7 +7,7 @@ const FAQScreen = () => {
 
 	const questionsAnswers = [
 		{ question: "How do I place an order?", answer: "You can place an order by adding items to your cart and proceeding to checkout.", category: "Ordering" },
-		{ question: "What payment methods are accepted?", answer: "We accept various payment methods including credit cards, Stripe, and others.", category: "Payment" },
+		{ question: "What payment methods are accepted?", answer: "We accept various payment methods including credit cards, PAYPAL, and others.", category: "Payment" },
 		{ question: "How do I track my order?", answer: "You can track your order by logging into your account and viewing your order history.", category: "Ordering" },
 		{ question: "How do I cancel an order?", answer: "Currently Only admin can cancel order. Please contact admin with our contact us page", category: "Ordering" },
 	];

@@ -21,7 +21,7 @@ const ForgetPasswordForm = () => {
 		if (!emailRegex.test(email)) {
 			return toast.error('Please enter a valid email address!', {
 				toastId: 'forgetPasswordToastId',
-				autoClose: 1000,
+				autoClose: 2000,
 			});
 		}
 
@@ -29,7 +29,7 @@ const ForgetPasswordForm = () => {
 			await forgetPassword({ email }).unwrap();
 			toast.success(`An email has been sent to ${email} with further instructions.`, {
 				toastId: 'forgetPasswordToastId',
-				autoClose: 1000,
+				autoClose: 2000,
 			});
 			navigate('/');
 		} catch (error) {
@@ -44,7 +44,7 @@ const ForgetPasswordForm = () => {
 	const showErrorToast = (message, toastId) => {
 		return toast.error(message, {
 			toastId: toastId,
-			autoClose: 1000,
+			autoClose: 2000,
 		});
 
 	};

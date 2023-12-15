@@ -33,7 +33,7 @@ const Header = () => {
       dispatch(resetCart());
       toast.success('Logged out successfully', {
         customId: 'logoutToastId',
-        autoClose: 1000,
+        autoClose: 2000,
       });
       navigate('/login');
     } catch (err) {
@@ -182,7 +182,7 @@ const Header = () => {
               {/* Admin Links */}
               {userInfo && userInfo.userType === 'Admin' && (
                 <NavDropdown title='Admin' id='adminmenu'>
-                  <LinkContainer to='/Admin/productlist'>
+                  <LinkContainer to='/Admin/productlist/page/1'>
                     <NavDropdown.Item>Products</NavDropdown.Item>
                   </LinkContainer>
                   <LinkContainer to='/Admin/userlist'>

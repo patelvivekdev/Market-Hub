@@ -16,15 +16,16 @@ const PlaceOrderScreen = () => {
 
 	const [createOrder, { isLoading, error }] = useCreateOrderMutation();
 
-	useEffect(() => {
-		if (!cart.cartItems.length) {
-			navigate('/cart');
-		}
-	}, [cart.cartItems.length, navigate]);
+	// useEffect(() => {
+	// 	if (!cart.cartItems.length) {
+	// 		navigate('/cart');
+	// 	}
+	// }, [cart.cartItems.length, navigate]);
 
 	const dispatch = useDispatch();
-	const placeOrderHandler = async () => {
+	const placeOrderHandler = async (e) => {
 		try {
+			e.preventDefault();
 			const { order } = await createOrder({
 				orderItems: cart.cartItems,
 				shippingAddress: cart.shippingAddress,
@@ -35,9 +36,9 @@ const PlaceOrderScreen = () => {
 				totalPrice: cart.totalPrice,
 			}).unwrap();
 
-			toast.success('Order placed successfully', {
+			toast.success(`Order ${order._id} placed successfully`, {
 				toastId: 'placeOrderToast',
-				autoClose: 1000,
+				autoClose: 2000,
 			});
 
 			dispatch(clearCartItems());

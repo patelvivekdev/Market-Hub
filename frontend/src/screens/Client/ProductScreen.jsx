@@ -10,6 +10,7 @@ import Message from "../../components/Message";
 import Rating from "../../components/Rating";
 import Img from "../../components/Img";
 import { formattedDateTime } from '../../utils/utils';
+import Meta from "../../components/Meta";
 
 const ProductScreen = () => {
 	const { id } = useParams();
@@ -28,7 +29,8 @@ const ProductScreen = () => {
 	const userType = userInfo?.userType;
 
 	// Check if the user is a client or a anonymous user
-	const isClient = userType === 'Client' || !userType
+	const isClientOrUser = userType === 'Client' || !userType
+	const isClient = userType === 'Client';
 	const isVendor = userType === 'Vendor';
 	const isCreator = product?.vendor?._id === userInfo?.profile?._id;
 
@@ -49,7 +51,7 @@ const ProductScreen = () => {
 		if (!image) {
 			return toast.error('Please select an image', {
 				toastId: 'changeImageToastId',
-				autoClose: 1000,
+				autoClose: 2000,
 			});
 		}
 
@@ -61,7 +63,7 @@ const ProductScreen = () => {
 			await changeImage({ productId: product._id, formData: formData }).unwrap();
 			toast.success('Image changed successfully', {
 				toastId: 'changeImageToastId',
-				autoClose: 1000,
+				autoClose: 2000,
 			});
 			refetch();
 		} catch (error) {
@@ -95,15 +97,6 @@ const ProductScreen = () => {
 	};
 
 	const addToCartHandler = () => {
-		//check if the user is verified
-		if (!userInfo?.isEmailVerified) {
-			return toast.error('Please verify your email address', {
-				toastId: 'addToCartToastId',
-				autoClose: 1000,
-			});
-		}
-
-
 		dispatch(addToCart({ ...product, qty }));
 		navigate('/cart');
 	};
@@ -116,7 +109,7 @@ const ProductScreen = () => {
 			await addReview({ productId: product._id, rating, reviewMessage }).unwrap();
 			toast.success('Review added successfully', {
 				toastId: 'addReviewToastId',
-				autoClose: 1000,
+				autoClose: 2000,
 			});
 			setRating(0);
 			setReviewMessage('');
@@ -133,6 +126,7 @@ const ProductScreen = () => {
 	const renderProductDetails = () => {
 		return (
 			<>
+				<Meta title={product.name} description={product.description} keywords={product.name} />
 				{renderEditButton()}
 				<Row>
 					<Col md={3}>
@@ -192,14 +186,6 @@ const ProductScreen = () => {
 							<ListGroup variant='flush'>
 								<ListGroup.Item>
 									<Row>
-										<Col>Price:</Col>
-										<Col>
-											<strong>${product.price}</strong>
-										</Col>
-									</Row>
-								</ListGroup.Item>
-								<ListGroup.Item>
-									<Row>
 										<Col>Status:</Col>
 										<Col>
 											{product.countInStock > 0 ? 'In Stock' : 'Out of Stock'}
@@ -216,7 +202,7 @@ const ProductScreen = () => {
 										</Row>
 									</ListGroup.Item>
 								)}
-								{isClient && product.countInStock > 0 && (
+								{isClientOrUser && product.countInStock > 0 && (
 									<ListGroup.Item>
 										<Row>
 											<Col>Qty</Col>
@@ -236,7 +222,7 @@ const ProductScreen = () => {
 										</Row>
 									</ListGroup.Item>
 								)}
-								{isClient && (
+								{isClientOrUser && (
 									<ListGroup.Item className='text-center'>
 										<Button
 											className='btn-block'
@@ -252,16 +238,26 @@ const ProductScreen = () => {
 						</Card>
 					</Col>
 					<Col md={3} className='justify-content-center'>
-						<Card className='text-center'>
+						<Card>
 							<Card.Body>
-								<Card.Title>Vendor Profile</Card.Title>
-								<Card.Text>{product.vendor?.vendorName}</Card.Text>
-								<Card.Text>{product.vendor?.phone}</Card.Text>
-								<Card.Text>{product.vendor?.address}</Card.Text>
+
+								<ListGroup variant='flush'>
+									<ListGroup.Item>
+										<Card.Title className="text-center">Vendor Profile</Card.Title>
+									</ListGroup.Item>
+									<ListGroup.Item>
+										<Row>
+											<Col>Name:</Col>
+											<Col>
+												<strong><Card.Text>{product.vendor?.name}</Card.Text></strong>
+											</Col>
+										</Row>
+									</ListGroup.Item>
+								</ListGroup>
 							</Card.Body>
 						</Card>
 					</Col>
-				</Row>
+				</Row >
 				<Row className='mt-5'>
 					<Col md={8}>
 						<h2>Reviews</h2>

@@ -32,7 +32,7 @@ const StoreScreen = () => {
 
 	return (
 		<>
-			<Meta title="products" description="products" keywords="products" />
+			<Meta title="Products" description="products" keywords="products" />
 			<Row>
 				<h1 className='text-center'>Latest Products</h1>
 				<hr />
@@ -137,52 +137,50 @@ const StoreScreen = () => {
 
 						{/* If products are available show them */}
 						{products.products.map((product) => (
-							<>
-								<Meta title={product.name} description={product.description} />
-								<Col className='mt-4' key={product._id} sm={12} md={6} lg={4}>
-									<Card className='mb-3 h-100 d-flex'>
-										<div style={{ height: '200px', overflow: 'hidden', borderRadius: '5px 5px 0 0' }}>
-											<img
-												src={product.image} // Replace with the path to your product image
-												alt={product.name}
-												className='img-fluid'
-												style={{ width: '100%', objectFit: 'cover', height: '100%' }}
-											/>
-										</div>
-										<Card.Body className='d-flex flex-column'>
-											<Card.Title>{product.name}</Card.Title>
-											<Card.Text>{product.description}</Card.Text>
-											<Card.Text className='text-muted'>
-												Category : <span className='badge rounded-pill' style={{ backgroundColor: '#E98E0D', color: 'white' }}>
-													<Link
-														style={{
-															color: 'white',
-															textDecoration: 'none'
-														}}
-														to={`/store/category/${product.category._id}`}>{product.category.name}</Link>
-												</span>
-											</Card.Text>
-
-											{/* vendor */}
-											<Card.Text className='text-muted'>
-												Vendor : <span className='badge rounded-pill' style={{ backgroundColor: '#1536F1', color: 'white' }}>
-													<Link style={{
+							<Col key={product._id} className='mt-4' sm={12} md={6} lg={4}>
+								{/* <Meta title={product.name} description={product.description} /> */}
+								<Card className='mb-3 h-100 d-flex'>
+									<div style={{ height: '200px', overflow: 'hidden', borderRadius: '5px 5px 0 0' }}>
+										<img
+											src={product.image} // Replace with the path to your product image
+											alt={product.name}
+											className='img-fluid'
+											style={{ width: '100%', objectFit: 'cover', height: '100%' }}
+										/>
+									</div>
+									<Card.Body className='d-flex flex-column'>
+										<Card.Title>{product.name}</Card.Title>
+										<Card.Text>{product.description}</Card.Text>
+										<Card.Text className='text-muted'>
+											Category : <span className='badge rounded-pill' style={{ backgroundColor: '#E98E0D', color: 'white' }}>
+												<Link
+													style={{
 														color: 'white',
 														textDecoration: 'none'
-													}} to={`/store/vendor/${product.vendor._id}`}>{product.vendor.name}</Link>
-												</span>
-											</Card.Text>
-											<Button
-												variant='primary'
-												className='mt-auto my-2'
-												onClick={() => navigate(`/products/${product._id}`)}
-											>
-												View Details
-											</Button>
-										</Card.Body>
-									</Card>
-								</Col>
-							</>
+													}}
+													to={`/store/category/${product.category._id}`}>{product.category.name}</Link>
+											</span>
+										</Card.Text>
+
+										{/* vendor */}
+										<Card.Text className='text-muted'>
+											Vendor : <span className='badge rounded-pill' style={{ backgroundColor: '#1536F1', color: 'white' }}>
+												<Link style={{
+													color: 'white',
+													textDecoration: 'none'
+												}} to={`/store/vendor/${product.vendor._id}`}>{product.vendor.name}</Link>
+											</span>
+										</Card.Text>
+										<Button
+											variant='primary'
+											className='mt-auto my-2'
+											onClick={() => navigate(`/products/${product._id}`)}
+										>
+											View Details
+										</Button>
+									</Card.Body>
+								</Card>
+							</Col>
 						))}
 					</Row>
 					<Row className='text-center m-4'>

@@ -9,6 +9,7 @@ import Message from "../components/Message";
 import { formattedDateTime } from "../utils/utils";
 import { useGetUserProfileQuery, useUploadProfilePicMutation, useSendVerifyEmailMutation } from '../slices/usersApiSlice'
 import { toast } from "react-toastify";
+import Meta from "../components/Meta";
 
 const ProfileScreen = () => {
   const [showModal, setShowModal] = useState(false);
@@ -29,7 +30,7 @@ const ProfileScreen = () => {
     await sendVerifyEmail().unwrap();
     toast.success('Verification email sent successfully', {
       toastId: 'sendVerifyEmailToastId',
-      autoClose: 1000,
+      autoClose: 2000,
     });
   }
 
@@ -41,7 +42,7 @@ const ProfileScreen = () => {
     if (!image) {
       return toast.error('Please select an image', {
         toastId: 'changeImageToastId',
-        autoClose: 1000,
+        autoClose: 2000,
       });
     }
 
@@ -53,14 +54,14 @@ const ProfileScreen = () => {
       await uploadProfilePic(formData).unwrap();
       toast.success('Image changed successfully', {
         toastId: 'changeImageToastId',
-        autoClose: 1000,
+        autoClose: 2000,
       });
       refetch()
 
     } catch (err) {
       toast.error(err.data.message, {
         toastId: 'changeImageToastId',
-        autoClose: 1000,
+        autoClose: 2000,
       });
     }
   }
@@ -79,6 +80,7 @@ const ProfileScreen = () => {
         </Message>
       ) : (
         <>
+          <Meta title={userInfo.profile.name + " profile"} description={userInfo.profile.name + "profile"} keywords={userInfo.profile.name + "profile"} />
           {isImageUploading && <Loader />}
 
           {!isVerified && (
@@ -209,48 +211,57 @@ const ProfileScreen = () => {
                         {error?.data?.message || error.error}
                       </Message>
                     ) : (
-                      <Table striped hover responsive className='table-sm'>
-                        <thead>
-                          <tr>
-                            <th>ID</th>
-                            <th>DATE</th>
-                            <th>TOTAL</th>
-                            <th>PAID</th>
-                            <th>DELIVERED</th>
-                            <th></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {orders.map((order) => (
-                            <tr key={order._id}>
-                              <td>{order._id}</td>
-                              <td>{order.createdAt.substring(0, 10)}</td>
-                              <td>{order.totalPrice}</td>
-                              <td>
-                                {order.isPaid ? (
-                                  formattedDateTime(order.paidAt)
-                                ) : (
-                                  <FaTimes style={{ color: 'red' }} />
-                                )}
-                              </td>
-                              <td>
-                                {order.isDelivered ? (
-                                  formattedDateTime(order.deliveredAt)
-                                ) : (
-                                  <FaTimes style={{ color: 'red' }} />
-                                )}
-                              </td>
-                              <td>
-                                <LinkContainer to={`/orders/${order._id}`}>
-                                  <Button className='btn-sm' variant='light'>
-                                    Details
-                                  </Button>
-                                </LinkContainer>
-                              </td>
+
+                      // If no order show no orders message
+                      orders.length === 0 ? (
+                        <Col className='mt-4'>
+                          <Message variant='info'>No Orders Found</Message>
+                        </Col>
+                      ) : (
+
+                        <Table striped hover responsive className='table-sm'>
+                          <thead>
+                            <tr>
+                              <th>ID</th>
+                              <th>DATE</th>
+                              <th>TOTAL</th>
+                              <th>PAID</th>
+                              <th>DELIVERED</th>
+                              <th></th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </Table>
+                          </thead>
+                          <tbody>
+                            {orders.map((order) => (
+                              <tr key={order._id}>
+                                <td>{order._id}</td>
+                                <td>{order.createdAt.substring(0, 10)}</td>
+                                <td>{order.totalPrice}</td>
+                                <td>
+                                  {order.isPaid ? (
+                                    formattedDateTime(order.paidAt)
+                                  ) : (
+                                    <FaTimes style={{ color: 'red' }} />
+                                  )}
+                                </td>
+                                <td>
+                                  {order.isDelivered ? (
+                                    formattedDateTime(order.deliveredAt)
+                                  ) : (
+                                    <FaTimes style={{ color: 'red' }} />
+                                  )}
+                                </td>
+                                <td>
+                                  <LinkContainer to={`/orders/${order._id}`}>
+                                    <Button className='btn-sm' variant='light'>
+                                      Details
+                                    </Button>
+                                  </LinkContainer>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </Table>
+                      )
                     )
                   }
                 </Col>

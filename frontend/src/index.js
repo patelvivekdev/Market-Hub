@@ -196,7 +196,7 @@ const routes = createBrowserRouter(
 			{/* ADMIN ROUTES */}
 			<Route path='' element={<AdminRoute />}>
 				<Route
-					path='/Admin/productlist'
+					path='/Admin/productlist/page/:pageNumber'
 					element={<ProductListScreen />}
 				/>
 				<Route

@@ -16,7 +16,7 @@ const VerifyAccountScreen = () => {
 	const showErrorToast = (message, toastId) => {
 		return toast.error(message, {
 			toastId: toastId,
-			autoClose: 1000,
+			autoClose: 2000,
 		});
 	};
 
@@ -27,7 +27,7 @@ const VerifyAccountScreen = () => {
 			await verify({ verifyToken }).unwrap();
 			toast.success(`Password reset successfully.`, {
 				toastId: 'resetPasswordToastId',
-				autoClose: 1000,
+				autoClose: 2000,
 			});
 			navigate('/');
 		} catch (error) {
