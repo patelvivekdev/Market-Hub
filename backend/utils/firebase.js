@@ -27,17 +27,12 @@ const resizeImage = async (file) => {
 
 const uploadImage = async (file) => {
 	try {
-		console.log(file);
 		const resizedImage = await resizeImage(file);
-		console.log(resizedImage);
 		const imageRef = ref(storage, file.originalname);
-		console.log(imageRef);
 		const metatype = {
 			contentType: file.mimetype,
 			name: file.originalname,
 		};
-
-		console.log(metatype);
 
 		const snapshot = await uploadBytes(
 			imageRef,
@@ -45,10 +40,7 @@ const uploadImage = async (file) => {
 			metatype
 		);
 
-		console.log(snapshot);
-
 		const downloadURL = await getDownloadURL(imageRef);
-		console.log(downloadURL);
 		return downloadURL;
 		// create public url
 	} catch (error) {
