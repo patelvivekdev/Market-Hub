@@ -268,7 +268,7 @@ const ProductScreen = () => {
 									<strong>{review.name}</strong>
 									<Row>
 										<Col md={2}>
-											<Rating value={review.rating} color='#f8e825' />
+											<Rating value={review.rating} />
 										</Col>
 										<Col>
 											<p>{review.reviewMessage}</p>

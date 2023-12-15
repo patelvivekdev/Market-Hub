@@ -183,9 +183,14 @@ const updateProduct = asyncHandler(async (req, res) => {
 	if (image_url) {
 		// Delete old image from firebase storage
 		if (product.image !== '') {
-			await deleteImage(product.image);
+			try {
+				await deleteImage(product.image);
+			} catch (error) {
+				console.log(error);
+			} finally {
+				product.image = image_url;
+			}
 		}
-		product.image = image_url;
 	}
 
 	// Save product to the database

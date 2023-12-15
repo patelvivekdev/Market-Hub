@@ -543,38 +543,47 @@ const validateAccount = asyncHandler(async (req, res) => {
 		});
 	}
 
-	user.isActive = true;
-	user.isEmailVerified = true;
-	await user.save();
+	try {
+		user.isActive = true;
+		user.isEmailVerified = true;
+		await user.save();
 
-	// delete token
-	await TokenModel.deleteOne({ token: verifyToken });
+		// delete token
+		await TokenModel.deleteOne({ token: verifyToken });
 
-	// send email
-	const message = `
+		// send email
+		const message = `
 		<h1>You have successfully verified your account</h1>
 		<p>Thank you for verifying your account.</p>
-
+		
 		<p>Regards,</p>
 		<p>Team</p>
-	`;
+		`;
 
-	try {
-		await sendMail({
-			To: user.email,
-			Subject: 'Account Verified',
-			HTMLPart: message,
-		});
+		try {
+			await sendMail({
+				To: user.email,
+				Subject: 'Account Verified',
+				HTMLPart: message,
+			});
+		} catch (error) {
+			console.log("--> Error: Can't send email", error);
+		}
 
-		return res.status(200).json({
-			success: true,
-			message: 'Account verified!',
+		return res.json({
+			_id: user._id,
+			email: user.email,
+			username: user.username || user.email,
+			userType: user.userType,
+			isActive: user.isActive,
+			profile: user.profile,
+			fullName: user.profile.name,
+			isEmailVerified: user.isEmailVerified,
 		});
 	} catch (error) {
-		console.log("--> Error: Can't send email", error);
-		return res.status(200).json({
-			success: true,
-			message: 'Account verified!',
+		console.log("--> Error: Can't verify account", error);
+		return res.status(500).json({
+			message: 'Verified your account! Please try again.',
 		});
 	}
 });
