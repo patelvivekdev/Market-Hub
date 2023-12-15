@@ -125,6 +125,8 @@ const RegisterScreen = () => {
 					name,
 					address,
 					phone,
+					website,
+					description,
 				}
 			};
 			const res = await register(userData).unwrap();

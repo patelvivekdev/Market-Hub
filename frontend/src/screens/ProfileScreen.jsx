@@ -126,18 +126,23 @@ const ProfileScreen = () => {
                 <Col md={4} className="mt-4">
                   <h2>Vendor Profile</h2>
                   <Row className="mb-3">
-                    <Col md={3} className="fw-bold">Company Address:</Col>
-                    <Col md={9}>{userInfo.profile?.address}</Col>
+                    <Col md={4} className="fw-bold">Company Address:</Col>
+                    <Col md={8}>{userInfo.profile?.address}</Col>
                   </Row>
 
                   <Row className="mb-3">
-                    <Col md={3} className="fw-bold">Company Phone:</Col>
-                    <Col md={9}>{userInfo.profile?.phone}</Col>
+                    <Col md={4} className="fw-bold">Company Phone:</Col>
+                    <Col md={8}>{userInfo.profile?.phone}</Col>
                   </Row>
 
                   <Row className="mb-3">
-                    <Col md={3} className="fw-bold">Company website:</Col>
-                    <Col md={9}>{userInfo.profile?.website}</Col>
+                    <Col md={4} className="fw-bold">Company website:</Col>
+                    <Col md={8}>{userInfo.profile?.website}</Col>
+                  </Row>
+
+                  <Row className="mb-3">
+                    <Col md={4} className="fw-bold">Company Description:</Col>
+                    <Col md={8}>{userInfo.profile?.description}</Col>
                   </Row>
                 </Col>
               )

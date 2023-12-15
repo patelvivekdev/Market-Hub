@@ -14,12 +14,14 @@ import Vendor from '../models/vendorModel.js';
 
 dotenv.config();
 
-const BASE_URL =
+export const BASE_URL =
 	process.env.NODE_ENV === 'DEVELOPMENT'
 		? process.env.BASE_URL_DEV
 		: process.env.NODE_ENV === 'PRODUCTION'
 		? process.env.BASE_URL_PROD
 		: process.env.BASE_URL_TEST;
+
+console.log('--> BASE_URL', BASE_URL);
 
 // ------------------------------ EMAIL CHECK ------------------------
 
