@@ -7,6 +7,7 @@
   - [License](#license)
   - [Contributing](#contributing)
   - [Authors](#authors)
+  - [Links](#links)
 
 # Market-Hub
 
@@ -67,12 +68,13 @@ node backend/index.js
 
 ## Authors
 
--    [`Vivek Patel`](https://www.github.com/Vivek-0206)
--    [`Yatharth Shah`]()
--    [`Om Italiya`]()
--    [`Krunalkumar Mangukiya`]()
--    [`Sheshankumar Patel`]()
+-   [`Vivek Patel`](https://www.patelvivek.dev)
+
+## Links
+
+-   [`Market-hub`](https://www.patelvivek.dev/projects/market-hub)
+-   [`Live Demo`](https://market-hub.patelvivek.dev/)
 
 <div style="text-align: center;">
-MADE WITH ❤️ AND JAVASCRIPT
+MADE WITH ❤️ AND React / Javascript
 </div>
